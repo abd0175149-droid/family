@@ -96,10 +96,9 @@ export default function FamilyTreeView() {
 
     const generations: Generation[] = []
     const householdLevels = new Map<string, number>()
-    const processed = new Set<string>()
 
     // حساب مستويات الأبناء مع حماية قوية من الحلقات
-    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>, maxDepth: number = 100) => {
+    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>, maxDepth: number = 50) => {
       // حماية من الحلقات الدائرية
       if (visitedInPath.has(householdId)) {
         console.warn(`Circular reference detected for household: ${householdId}`)
@@ -127,10 +126,11 @@ export default function FamilyTreeView() {
 
       // معالجة الأبناء - نزور كل الأبناء حتى لو تمت زيارتهم من قبل
       // لأن نفس الأسرة قد تكون في مستويات مختلفة عبر مسارات مختلفة
+      // لكن نتحقق من الحلقات الدائرية فقط
       household.childLinks.forEach((link) => {
         const childId = link.childHousehold?.id || link.childHouseholdId
         if (childId) {
-          // نتحقق فقط من الحلقات الدائرية، وليس من الزيارة السابقة
+          // نتحقق فقط من الحلقات الدائرية في المسار الحالي
           if (!newVisitedPath.has(childId)) {
             processChildren(childId, currentLevel + 1, newVisitedPath, maxDepth)
           } else {
@@ -140,13 +140,11 @@ export default function FamilyTreeView() {
       })
     }
 
-    // معالجة الجذور
+    // معالجة الجذور - نبدأ من كل جذر بشكل منفصل
     roots.forEach((root) => {
-      if (!processed.has(root.id)) {
-        processed.add(root.id)
-        householdLevels.set(root.id, 0)
-        processChildren(root.id, 0, new Set(), 100)
-      }
+      // نبدأ من كل جذر بمسار جديد
+      householdLevels.set(root.id, 0)
+      processChildren(root.id, 0, new Set(), 50)
     })
 
     // معالجة الأسر التي لم يتم زيارتها (أسر بدون روابط أو أسر معزولة)
