@@ -6,37 +6,11 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'myfamily.grade.sbs'],
   },
-  // إعدادات الملفات الثابتة
-  // assetPrefix: process.env.NODE_ENV === 'production' ? '' : undefined,
-  // ضمان توليد CSS بشكل صحيح
-  // experimental: {
-  //   optimizeCss: false,
-  // },
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname),
     }
-    
-    // ضمان أن CSS يتم توليده بشكل صحيح
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          ...config.optimization.splitChunks,
-          cacheGroups: {
-            ...config.optimization.splitChunks.cacheGroups,
-            styles: {
-              name: 'styles',
-              test: /\.(css|scss)$/,
-              chunks: 'all',
-              enforce: true,
-            },
-          },
-        },
-      }
-    }
-    
     return config
   },
 }
