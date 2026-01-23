@@ -4,13 +4,14 @@ import { withPermission } from '@/lib/middleware/rbac'
 import { PERMISSIONS } from '@/lib/constants/permissions'
 import { UserService } from '@/lib/services/UserService'
 import { logAction } from '@/lib/middleware/audit'
+import { UserRole, UserStatus } from '@prisma/client'
 
 const updateUserSchema = z.object({
   fullName: z.string().min(1).optional(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
-  role: z.string().optional(),
-  status: z.string().optional(),
+  role: z.nativeEnum(UserRole).optional(),
+  status: z.nativeEnum(UserStatus).optional(),
   personId: z.string().optional(),
 })
 
