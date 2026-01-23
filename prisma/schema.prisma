@@ -1,0 +1,319 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  super_admin
+  secretary
+  treasurer
+  member
+}
+
+enum UserStatus {
+  active
+  suspended
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum HouseholdMemberRole {
+  husband
+  wife
+  child
+}
+
+enum RelationType {
+  father
+  mother
+  spouse
+}
+
+enum InvoiceStatus {
+  unpaid
+  partial
+  paid
+}
+
+enum MeetingStatus {
+  draft
+  published
+  archived
+}
+
+model User {
+  id           String      @id @default(cuid())
+  personId     String?     @unique @map("person_id")
+  fullName     String      @map("full_name")
+  email        String      @unique
+  phone        String?
+  passwordHash String      @map("password_hash")
+  role         UserRole    @default(member)
+  status       UserStatus  @default(active)
+  lastLoginAt  DateTime?   @map("last_login_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  person              Person?              @relation(fields: [personId], references: [id], onDelete: SetNull)
+  createdPayments     Payment[]            @relation("PaymentCreatedBy")
+  createdWithdrawals  Withdrawal[]         @relation("WithdrawalCreatedBy")
+  createdDues         MemberDues[]        @relation("DuesCreatedBy")
+  uploadedFiles       File[]               @relation("FileUploadedBy")
+  invoices            Invoice[]
+  payments            Payment[]
+  dues                MemberDues[]
+  meetingMinutes      MeetingMinutes[]     @relation("MinuteCreatedBy")
+  updatedMeetingMinutes MeetingMinutes[]  @relation("MinuteUpdatedBy")
+  updatedNextMeetings  NextMeeting[]       @relation("NextMeetingUpdatedBy")
+  createdLocationOptions MeetingLocationOption[] @relation("LocationOptionCreatedBy")
+  votes                Vote[]
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+model Person {
+  id         String    @id @default(cuid())
+  fullName   String    @map("full_name")
+  gender     Gender
+  birthDate  DateTime? @map("birth_date")
+  deathDate  DateTime? @map("death_date")
+  photoFileId String?  @unique @map("photo_file_id")
+  notes      String?   @db.Text
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  photoFile      File?              @relation(fields: [photoFileId], references: [id], onDelete: SetNull)
+  user           User?
+  householdMembers HouseholdMember[]
+  relationships1 Relationship[]      @relation("Person1")
+  relationships2 Relationship[]      @relation("Person2")
+  householdLinks1 HouseholdLink[]    @relation("LinkViaPerson")
+
+  @@map("persons")
+}
+
+model Household {
+  id        String    @id @default(cuid())
+  title     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  members       HouseholdMember[]
+  childLinks    HouseholdLink[]    @relation("ChildHousehold")
+  parentLinks   HouseholdLink[]    @relation("ParentHousehold")
+
+  @@map("households")
+}
+
+model HouseholdMember {
+  id              String              @id @default(cuid())
+  householdId     String              @map("household_id")
+  personId        String              @map("person_id")
+  role            HouseholdMemberRole
+  isPrimarySpouse Boolean             @default(false) @map("is_primary_spouse")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  person    Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, personId])
+  @@map("household_members")
+}
+
+model Relationship {
+  id          String       @id @default(cuid())
+  personId1   String       @map("person_id_1")
+  personId2   String       @map("person_id_2")
+  relationType RelationType @map("relation_type")
+  startDate   DateTime?    @map("start_date")
+  endDate     DateTime?    @map("end_date")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  person1 Person @relation("Person1", fields: [personId1], references: [id], onDelete: Cascade)
+  person2 Person @relation("Person2", fields: [personId2], references: [id], onDelete: Cascade)
+
+  @@map("relationships")
+}
+
+model HouseholdLink {
+  id               String  @id @default(cuid())
+  childHouseholdId String  @unique @map("child_household_id")
+  parentHouseholdId String @map("parent_household_id")
+  linkViaPersonId  String  @map("link_via_person_id")
+  viaSide          String? @map("via_side") @db.VarChar(50)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  childHousehold  Household @relation("ChildHousehold", fields: [childHouseholdId], references: [id], onDelete: Cascade)
+  parentHousehold Household @relation("ParentHousehold", fields: [parentHouseholdId], references: [id], onDelete: Cascade)
+  linkViaPerson   Person    @relation("LinkViaPerson", fields: [linkViaPersonId], references: [id], onDelete: Cascade)
+
+  @@map("household_links")
+}
+
+model File {
+  id          String    @id @default(cuid())
+  fileName    String    @map("file_name")
+  filePath    String    @map("file_path")
+  mimeType    String    @map("mime_type")
+  fileSize    Int       @map("file_size")
+  uploadedBy  String    @map("uploaded_by")
+  uploadedAt  DateTime  @default(now()) @map("uploaded_at")
+
+  uploader        User                @relation("FileUploadedBy", fields: [uploadedBy], references: [id], onDelete: Cascade)
+  personPhotos    Person[]
+  paymentReceipts Payment[]
+  withdrawalReceipts Withdrawal[]
+
+  @@map("files")
+}
+
+model MemberDues {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  monthlyAmount Decimal   @map("monthly_amount") @db.Decimal(10, 2)
+  effectiveFrom DateTime  @map("effective_from")
+  effectiveTo   DateTime? @map("effective_to")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdBy     String    @map("created_by")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creator   User   @relation("DuesCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("member_dues")
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  userId     String        @map("user_id")
+  year       Int
+  month      Int
+  dueAmount  Decimal       @map("due_amount") @db.Decimal(10, 2)
+  status     InvoiceStatus @default(unpaid)
+  issuedAt  DateTime      @default(now()) @map("issued_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@unique([userId, year, month])
+  @@map("invoices")
+}
+
+model Payment {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  invoiceId     String    @map("invoice_id")
+  amountPaid    Decimal   @map("amount_paid") @db.Decimal(10, 2)
+  paidAt        DateTime  @map("paid_at")
+  receiptFileId String?   @map("receipt_file_id")
+  createdBy     String    @map("created_by")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoice      Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  receiptFile  File?   @relation(fields: [receiptFileId], references: [id], onDelete: SetNull)
+  creator      User    @relation("PaymentCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Withdrawal {
+  id              String    @id @default(cuid())
+  amount          Decimal   @db.Decimal(10, 2)
+  reason          String    @db.Text
+  beneficiaryName String?   @map("beneficiary_name") @db.VarChar(255)
+  receiptFileId   String?   @map("receipt_file_id")
+  withdrawnAt     DateTime  @map("withdrawn_at")
+  createdBy       String    @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  receiptFile File? @relation(fields: [receiptFileId], references: [id], onDelete: SetNull)
+  creator     User  @relation("WithdrawalCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("withdrawals")
+}
+
+model MeetingMinutes {
+  id        String        @id @default(cuid())
+  meetingDate DateTime    @map("meeting_date")
+  title     String
+  content   String        @db.LongText
+  status    MeetingStatus @default(draft)
+  createdBy String        @map("created_by")
+  updatedBy String        @map("updated_by")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  creator User @relation("MinuteCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  updater User @relation("MinuteUpdatedBy", fields: [updatedBy], references: [id], onDelete: Cascade)
+
+  @@map("meeting_minutes")
+}
+
+model NextMeeting {
+  id          String    @id @default("1")
+  meetingDate DateTime  @map("meeting_date")
+  description String?   @db.Text
+  updatedBy   String    @map("updated_by")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  updater User @relation("NextMeetingUpdatedBy", fields: [updatedBy], references: [id], onDelete: Cascade)
+
+  @@map("next_meeting")
+}
+
+model MeetingLocationOption {
+  id                String    @id @default(cuid())
+  isForNextMeeting  Boolean   @default(true) @map("is_for_next_meeting")
+  title             String
+  locationUrl       String?   @map("location_url") @db.VarChar(500)
+  createdBy         String    @map("created_by")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  creator User  @relation("LocationOptionCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  votes   Vote[]
+
+  @@map("meeting_location_options")
+}
+
+model Vote {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  meetingContext  String    @default("next_meeting") @map("meeting_context") @db.VarChar(50)
+  optionId        String    @map("option_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user   User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  option MeetingLocationOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, meetingContext])
+  @@map("votes")
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  action      String    @db.VarChar(100)
+  resource    String?   @db.VarChar(100)
+  resourceId  String?   @map("resource_id") @db.VarChar(100)
+  details     String?   @db.Text
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
