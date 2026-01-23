@@ -1,17 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { withRetryAndTimeout } from '@/lib/utils/prisma-retry'
 
 export async function GET() {
   try {
-    // Test database connection with timeout and error handling
-    const connectionTest = await Promise.race([
-      prisma.user.count().catch(() => {
-        throw new Error('Database query failed')
-      }),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 3000)
-      )
-    ])
+    // Test database connection with retry and timeout
+    await withRetryAndTimeout(
+      () => prisma.user.count(),
+      { maxRetries: 2, delay: 500 },
+      3000
+    )
     
     return NextResponse.json({
       status: 'ok',

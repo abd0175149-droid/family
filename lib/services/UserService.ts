@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { UserRole, UserStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { withRetryAndTimeout } from '@/lib/utils/prisma-retry'
 
 export interface CreateUserData {
   fullName: string
@@ -47,12 +48,17 @@ export class UserService {
   }
 
   static async getUserByEmail(email: string) {
-    return prisma.user.findUnique({
-      where: { email },
-      include: {
-        person: true,
-      },
-    })
+    return withRetryAndTimeout(
+      () =>
+        prisma.user.findUnique({
+          where: { email },
+          include: {
+            person: true,
+          },
+        }),
+      { maxRetries: 3, delay: 500 },
+      5000
+    )
   }
 
   static async createUser(data: CreateUserData) {
@@ -120,20 +126,35 @@ export class UserService {
         return null
       }
 
-      // Update last login - بدون انتظار (non-blocking)
-      prisma.user
-        .update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        })
-        .catch((err) => {
-          // تجاهل أخطاء تحديث last login
-          console.error('Error updating last login (non-critical):', err)
-        })
+      // Update last login - بدون انتظار (non-blocking) مع retry
+      withRetryAndTimeout(
+        () =>
+          prisma.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+          }),
+        { maxRetries: 2, delay: 300 },
+        3000
+      ).catch((err) => {
+        // تجاهل أخطاء تحديث last login
+        console.error('Error updating last login (non-critical):', err)
+      })
 
       return user
     } catch (error: any) {
       console.error('Error in verifyPassword:', error)
+      
+      // إذا كان الخطأ PANIC، نحاول إعادة الاتصال
+      if (error.message?.includes('PANIC') || error.message?.includes('timer has gone away')) {
+        try {
+          await prisma.$disconnect()
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          await prisma.$connect()
+        } catch (reconnectError) {
+          console.error('Failed to reconnect Prisma:', reconnectError)
+        }
+      }
+      
       // إعادة رمي الخطأ للتعامل معه في API route
       throw new Error(`خطأ في التحقق من كلمة المرور: ${error.message || 'خطأ غير معروف'}`)
     }
