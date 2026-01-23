@@ -23,32 +23,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Login attempt for:', email)
 
-    // التحقق من الاتصال بقاعدة البيانات أولاً (مع timeout)
-    try {
-      await Promise.race([
-        prisma.$queryRaw`SELECT 1`,
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database connection timeout')), 5000)
-        )
-      ])
-    } catch (dbError: any) {
-      console.error('Database connection error:', dbError)
-      // إعادة محاولة الاتصال مرة واحدة
-      try {
-        await prisma.$disconnect()
-        await prisma.$connect()
-      } catch (retryError) {
-        console.error('Retry connection failed:', retryError)
-      }
-      return NextResponse.json(
-        { 
-          error: 'خطأ في الاتصال بقاعدة البيانات',
-          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
-        },
-        { status: 500 }
-      )
-    }
-
+    // محاولة تسجيل الدخول مباشرة بدون فحص الاتصال المسبق
     const user = await UserService.verifyPassword(email, password)
     if (!user) {
       console.log('Login failed: Invalid credentials')
@@ -97,17 +72,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Login error:', error)
-    console.error('Error stack:', error.stack)
-    console.error('Error name:', error.name)
-    console.error('Error message:', error.message)
+    console.error('Login error:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    })
     
-    // إرجاع تفاصيل الخطأ مؤقتاً للتصحيح
+    // إرجاع رسالة خطأ واضحة
+    const errorMessage = error.message?.includes('خطأ في التحقق')
+      ? error.message
+      : 'حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.'
+    
     return NextResponse.json(
       { 
-        error: 'حدث خطأ أثناء تسجيل الدخول',
-        details: error.message || 'Unknown error',
-        type: error.name || 'Error',
+        error: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && {
+          details: error.message,
+          type: error.name,
+        }),
       },
       { status: 500 }
     )

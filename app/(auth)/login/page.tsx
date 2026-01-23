@@ -24,9 +24,26 @@ export default function LoginPage() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'خطأ غير معروف' }))
-        setError(errorData.error || errorData.message || 'حدث خطأ أثناء تسجيل الدخول')
-        console.error('Login error:', errorData)
+        let errorData: any = { error: 'خطأ غير معروف' }
+        try {
+          const text = await response.text()
+          if (text) {
+            errorData = JSON.parse(text)
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError)
+          errorData = { error: `خطأ ${response.status}: ${response.statusText}` }
+        }
+        
+        const errorMessage = errorData.error || errorData.message || 'حدث خطأ أثناء تسجيل الدخول'
+        const errorDetails = errorData.details ? `\n${errorData.details}` : ''
+        
+        setError(errorMessage + errorDetails)
+        console.error('Login error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+        })
         setLoading(false)
         return
       }

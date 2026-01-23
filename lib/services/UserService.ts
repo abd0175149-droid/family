@@ -112,30 +112,30 @@ export class UserService {
     try {
       const user = await this.getUserByEmail(email)
       if (!user) {
-        console.log('User not found:', email)
         return null
       }
 
-      console.log('User found, verifying password...')
       const isValid = await bcrypt.compare(password, user.passwordHash)
       if (!isValid) {
-        console.log('Invalid password for:', email)
         return null
       }
 
-      console.log('Password verified, updating last login...')
       // Update last login - بدون انتظار (non-blocking)
-      prisma.user.update({
-        where: { id: user.id },
-        data: { lastLoginAt: new Date() },
-      }).catch((err) => {
-        console.error('Error updating last login:', err)
-      })
+      prisma.user
+        .update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        })
+        .catch((err) => {
+          // تجاهل أخطاء تحديث last login
+          console.error('Error updating last login (non-critical):', err)
+        })
 
       return user
     } catch (error: any) {
       console.error('Error in verifyPassword:', error)
-      throw error
+      // إعادة رمي الخطأ للتعامل معه في API route
+      throw new Error(`خطأ في التحقق من كلمة المرور: ${error.message || 'خطأ غير معروف'}`)
     }
   }
 
