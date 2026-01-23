@@ -24,7 +24,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
+# .env - temporarily removed to allow production .env file in Git
 
 # vercel
 .vercel
