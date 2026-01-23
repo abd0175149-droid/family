@@ -20,21 +20,28 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // مهم للـ cookies
       })
 
-      const data = await response.json()
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'خطأ غير معروف' }))
+        setError(errorData.error || errorData.message || 'حدث خطأ أثناء تسجيل الدخول')
+        console.error('Login error:', errorData)
+        setLoading(false)
+        return
+      }
 
-      if (response.ok) {
+      const data = await response.json()
+      console.log('Login success:', data)
+
+      // إعطاء وقت قصير قبل التوجيه
+      setTimeout(() => {
         router.push('/tree')
         router.refresh()
-      } else {
-        setError(data.error || data.message || 'حدث خطأ أثناء تسجيل الدخول')
-        console.error('Login error:', data)
-      }
+      }, 100)
     } catch (error: any) {
       console.error('Login error:', error)
       setError(error.message || 'حدث خطأ أثناء تسجيل الدخول. تحقق من اتصال الإنترنت.')
-    } finally {
       setLoading(false)
     }
   }

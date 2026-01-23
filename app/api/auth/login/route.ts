@@ -20,8 +20,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = loginSchema.parse(body)
 
+    console.log('Login attempt for:', email)
+
     const user = await UserService.verifyPassword(email, password)
     if (!user) {
+      console.log('Login failed: Invalid credentials')
       return NextResponse.json(
         { error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' },
         { status: 401 }
@@ -29,6 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (user.status !== 'active') {
+      console.log('Login failed: User suspended')
       return NextResponse.json(
         { error: 'حسابك معطل' },
         { status: 403 }
@@ -43,7 +47,10 @@ export async function POST(request: NextRequest) {
       status: user.status,
     })
 
+    console.log('Login success for:', email)
+
     const response = NextResponse.json({
+      success: true,
       user: {
         id: user.id,
         email: user.email,
