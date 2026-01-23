@@ -7,16 +7,11 @@ const nextConfig = {
     domains: ['localhost', 'myfamily.grade.sbs'],
   },
   // إعدادات الملفات الثابتة
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : undefined,
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '' : undefined,
   // ضمان توليد CSS بشكل صحيح
-  experimental: {
-    optimizeCss: false,
-  },
-  // إعدادات إضافية للـ static files
-  generateBuildId: async () => {
-    // استخدام timestamp كـ build ID لضمان عدم cache الملفات القديمة
-    return `build-${Date.now()}`
-  },
+  // experimental: {
+  //   optimizeCss: false,
+  // },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
