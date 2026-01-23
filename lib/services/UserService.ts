@@ -109,23 +109,34 @@ export class UserService {
   }
 
   static async verifyPassword(email: string, password: string) {
-    const user = await this.getUserByEmail(email)
-    if (!user) {
-      return null
+    try {
+      const user = await this.getUserByEmail(email)
+      if (!user) {
+        console.log('User not found:', email)
+        return null
+      }
+
+      console.log('User found, verifying password...')
+      const isValid = await bcrypt.compare(password, user.passwordHash)
+      if (!isValid) {
+        console.log('Invalid password for:', email)
+        return null
+      }
+
+      console.log('Password verified, updating last login...')
+      // Update last login - بدون انتظار (non-blocking)
+      prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      }).catch((err) => {
+        console.error('Error updating last login:', err)
+      })
+
+      return user
+    } catch (error: any) {
+      console.error('Error in verifyPassword:', error)
+      throw error
     }
-
-    const isValid = await bcrypt.compare(password, user.passwordHash)
-    if (!isValid) {
-      return null
-    }
-
-    // Update last login
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    })
-
-    return user
   }
 
   static async changePassword(userId: string, newPassword: string) {

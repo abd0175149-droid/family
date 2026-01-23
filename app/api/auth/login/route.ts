@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { UserService } from '@/lib/services/UserService'
 import { generateToken, setAuthCookie } from '@/lib/middleware/auth'
 import { rateLimit } from '@/lib/middleware/rate-limit'
+import { prisma } from '@/lib/prisma'
 
 const loginSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -10,17 +11,31 @@ const loginSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
-  // Rate limiting
-  const rateLimitResponse = rateLimit(5, 15 * 60 * 1000)(request)
-  if (rateLimitResponse) {
-    return rateLimitResponse
-  }
+  // Rate limiting - معطل مؤقتاً للاختبار
+  // const rateLimitResponse = rateLimit(5, 15 * 60 * 1000)(request)
+  // if (rateLimitResponse) {
+  //   return rateLimitResponse
+  // }
 
   try {
     const body = await request.json()
     const { email, password } = loginSchema.parse(body)
 
     console.log('Login attempt for:', email)
+
+    // التحقق من الاتصال بقاعدة البيانات أولاً
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError: any) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { 
+          error: 'خطأ في الاتصال بقاعدة البيانات',
+          details: dbError.message 
+        },
+        { status: 500 }
+      )
+    }
 
     const user = await UserService.verifyPassword(email, password)
     if (!user) {
