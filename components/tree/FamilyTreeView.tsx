@@ -81,7 +81,7 @@ export default function FamilyTreeView() {
 
   // تنظيم الأسر حسب الأجيال
   const generations = useMemo(() => {
-    if (!treeData) return []
+    if (!treeData || treeData.households.length === 0) return []
 
     const householdMap = new Map<string, Household>()
     treeData.households.forEach((h) => householdMap.set(h.id, h))
@@ -91,50 +91,58 @@ export default function FamilyTreeView() {
       (h) => h.parentLinks.length === 0
     )
 
+    // إذا لم توجد جذور، استخدم جميع الأسر كجذور
+    const roots = rootHouseholds.length > 0 ? rootHouseholds : treeData.households
+
     const generations: Generation[] = []
-    const processed = new Set<string>()
-
-    // دالة لإيجاد مستوى الجيل
-    const getGenerationLevel = (householdId: string, level: number = 0): number => {
-      if (processed.has(householdId)) return level
-      processed.add(householdId)
-
-      const household = householdMap.get(householdId)
-      if (!household) return level
-
-      // إيجاد أعلى مستوى من الأبناء
-      let maxChildLevel = level
-        household.childLinks.forEach((link) => {
-          const childId = link.childHousehold?.id || link.childHouseholdId
-          const childLevel = getGenerationLevel(childId, level + 1)
-          maxChildLevel = Math.max(maxChildLevel, childLevel)
-        })
-
-      return maxChildLevel
-    }
-
-    // حساب المستويات لكل أسرة
     const householdLevels = new Map<string, number>()
-    rootHouseholds.forEach((root) => {
-      const level = getGenerationLevel(root.id)
-      householdLevels.set(root.id, 0) // الجذور في المستوى 0
+    const visited = new Set<string>()
 
-      // حساب مستويات الأبناء
-      const processChildren = (householdId: string, currentLevel: number) => {
-        const household = householdMap.get(householdId)
-        if (!household) return
-
-        household.childLinks.forEach((link) => {
-          const childId = link.childHousehold?.id || link.childHouseholdId
-          const existingLevel = householdLevels.get(childId) ?? -1
-          if (currentLevel + 1 > existingLevel) {
-            householdLevels.set(childId, currentLevel + 1)
-            processChildren(childId, currentLevel + 1)
-          }
-        })
+    // حساب مستويات الأبناء مع حماية من الحلقات
+    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>) => {
+      // حماية من الحلقات الدائرية
+      if (visitedInPath.has(householdId)) {
+        console.warn(`Circular reference detected for household: ${householdId}`)
+        return
       }
 
-      processChildren(root.id, 0)
+      const household = householdMap.get(householdId)
+      if (!household) return
+
+      // إضافة للزيارة في هذا المسار
+      const newVisitedPath = new Set(visitedInPath)
+      newVisitedPath.add(householdId)
+
+      // تحديث المستوى إذا كان أعلى
+      const existingLevel = householdLevels.get(householdId) ?? -1
+      if (currentLevel > existingLevel) {
+        householdLevels.set(householdId, currentLevel)
+      }
+
+      // معالجة الأبناء
+      household.childLinks.forEach((link) => {
+        const childId = link.childHousehold?.id || link.childHouseholdId
+        if (childId && !visited.has(childId)) {
+          visited.add(childId)
+          processChildren(childId, currentLevel + 1, newVisitedPath)
+        }
+      })
+    }
+
+    // معالجة الجذور
+    roots.forEach((root) => {
+      if (!visited.has(root.id)) {
+        visited.add(root.id)
+        householdLevels.set(root.id, 0)
+        processChildren(root.id, 0, new Set())
+      }
+    })
+
+    // معالجة الأسر التي لم يتم زيارتها (أسر بدون روابط)
+    treeData.households.forEach((household) => {
+      if (!householdLevels.has(household.id)) {
+        householdLevels.set(household.id, 0)
+      }
     })
 
     // تجميع الأسر حسب المستوى
@@ -146,6 +154,11 @@ export default function FamilyTreeView() {
       if (households.length > 0) {
         generations.push({ level: i, households })
       }
+    }
+
+    // إذا لم يتم العثور على أجيال، ضع جميع الأسر في جيل واحد
+    if (generations.length === 0) {
+      generations.push({ level: 0, households: treeData.households })
     }
 
     return generations
