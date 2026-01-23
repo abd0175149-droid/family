@@ -28,6 +28,11 @@ interface MemberFinanceSummary {
   }
 }
 
+const monthNames = [
+  'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+  'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+]
+
 export default function MemberFinanceSummary() {
   const [data, setData] = useState<MemberFinanceSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -46,101 +51,153 @@ export default function MemberFinanceSummary() {
   }, [])
 
   if (loading) {
-    return <div className="p-8 text-center">جاري التحميل...</div>
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
+          <p className="text-slate-600 dark:text-slate-400 font-medium">جاري التحميل...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!data) {
-    return <div className="p-8 text-center text-red-600">حدث خطأ أثناء جلب البيانات</div>
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+        <p className="text-red-600 dark:text-red-400 font-medium">حدث خطأ أثناء جلب البيانات</p>
+      </div>
+    )
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">ملخص مالي</h1>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+          ملخص مالي
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400">عرض تفاصيل دفعاتك وملخص الصندوق</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-4">ملخص الصندوق العام</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>إجمالي الدخل:</span>
-              <span className="font-bold">{data.fundSummary.totalIn.toLocaleString()} ر.س</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Fund Summary */}
+        <div className="bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
+          <h2 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+            <span className="text-2xl">💰</span>
+            ملخص الصندوق العام
+          </h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">إجمالي الدخل</span>
+              <span className="text-xl font-bold text-green-600 dark:text-green-400">
+                {data.fundSummary.totalIn.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span>إجمالي المصروف:</span>
-              <span className="font-bold">{data.fundSummary.totalOut.toLocaleString()} ر.س</span>
+            <div className="flex justify-between items-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">إجمالي المصروف</span>
+              <span className="text-xl font-bold text-red-600 dark:text-red-400">
+                {data.fundSummary.totalOut.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+              </span>
             </div>
-            <div className="flex justify-between border-t pt-2">
-              <span>الرصيد:</span>
-              <span className="font-bold">{data.fundSummary.balance.toLocaleString()} ر.س</span>
+            <div className="flex justify-between items-center p-4 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl text-white shadow-glow">
+              <span className="font-medium text-white/90">الرصيد الحالي</span>
+              <span className="text-xl font-bold">
+                {data.fundSummary.balance.toLocaleString()} <span className="text-sm text-white/80">ر.س</span>
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-4">ملخص دفعاتي</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>إجمالي المطلوب:</span>
-              <span className="font-bold">{data.summary.totalDue.toLocaleString()} ر.س</span>
+        {/* My Payments Summary */}
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
+          <h2 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+            <span className="text-2xl">💳</span>
+            ملخص دفعاتي
+          </h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">إجمالي المطلوب</span>
+              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                {data.summary.totalDue.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span>إجمالي المدفوع:</span>
-              <span className="font-bold text-green-600">{data.summary.totalPaid.toLocaleString()} ر.س</span>
+            <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">إجمالي المدفوع</span>
+              <span className="text-xl font-bold text-green-600 dark:text-green-400">
+                {data.summary.totalPaid.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span>المتبقي:</span>
-              <span className="font-bold text-red-600">{data.summary.totalRemaining.toLocaleString()} ر.س</span>
+            <div className="flex justify-between items-center p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">المتبقي</span>
+              <span className="text-xl font-bold text-amber-600 dark:text-amber-400">
+                {data.summary.totalRemaining.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+              </span>
             </div>
             {data.summary.overdueCount > 0 && (
-              <div className="flex justify-between text-red-600">
-                <span>متأخرات ({data.summary.overdueCount}):</span>
-                <span className="font-bold">{data.summary.overdueAmount.toLocaleString()} ر.س</span>
+              <div className="flex justify-between items-center p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                <span className="text-red-700 dark:text-red-400 font-medium">
+                  متأخرات ({data.summary.overdueCount})
+                </span>
+                <span className="text-xl font-bold text-red-600 dark:text-red-400">
+                  {data.summary.overdueAmount.toLocaleString()} <span className="text-sm text-slate-500">ر.س</span>
+                </span>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <h2 className="text-lg font-semibold mb-4">تفاصيل الفواتير</h2>
+      {/* Invoices Table */}
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-soft border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
+        <div className="p-6 border-b border-slate-200/50 dark:border-slate-800/50">
+          <h2 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <span className="text-2xl">📋</span>
+            تفاصيل الفواتير
+          </h2>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="text-right p-2">الشهر</th>
-                <th className="text-right p-2">المطلوب</th>
-                <th className="text-right p-2">المدفوع</th>
-                <th className="text-right p-2">المتبقي</th>
-                <th className="text-right p-2">الحالة</th>
+            <thead className="bg-slate-50 dark:bg-slate-800/50">
+              <tr>
+                <th className="text-right p-4 text-sm font-semibold text-slate-700 dark:text-slate-300">الشهر</th>
+                <th className="text-right p-4 text-sm font-semibold text-slate-700 dark:text-slate-300">المطلوب</th>
+                <th className="text-right p-4 text-sm font-semibold text-slate-700 dark:text-slate-300">المدفوع</th>
+                <th className="text-right p-4 text-sm font-semibold text-slate-700 dark:text-slate-300">المتبقي</th>
+                <th className="text-right p-4 text-sm font-semibold text-slate-700 dark:text-slate-300">الحالة</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50">
               {data.invoices.map((invoice) => {
                 const paid = invoice.payments.reduce((sum, p) => sum + Number(p.amountPaid), 0)
                 const remaining = Number(invoice.dueAmount) - paid
                 return (
-                  <tr key={invoice.id} className="border-b">
-                    <td className="p-2">
-                      {invoice.year}/{invoice.month}
+                  <tr key={invoice.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="p-4 font-medium text-slate-900 dark:text-slate-100">
+                      {monthNames[invoice.month - 1]} {invoice.year}
                     </td>
-                    <td className="p-2">{invoice.dueAmount.toLocaleString()} ر.س</td>
-                    <td className="p-2">{paid.toLocaleString()} ر.س</td>
-                    <td className="p-2">{remaining.toLocaleString()} ر.س</td>
-                    <td className="p-2">
+                    <td className="p-4 font-semibold text-slate-900 dark:text-slate-100">
+                      {invoice.dueAmount.toLocaleString()} <span className="text-slate-500">ر.س</span>
+                    </td>
+                    <td className="p-4 font-semibold text-green-600 dark:text-green-400">
+                      {paid.toLocaleString()} <span className="text-slate-500">ر.س</span>
+                    </td>
+                    <td className="p-4 font-semibold text-amber-600 dark:text-amber-400">
+                      {remaining.toLocaleString()} <span className="text-slate-500">ر.س</span>
+                    </td>
+                    <td className="p-4">
                       <span
-                        className={`px-2 py-1 rounded text-sm ${
+                        className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
                           invoice.status === 'paid'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                             : invoice.status === 'partial'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                         }`}
                       >
                         {invoice.status === 'paid'
-                          ? 'مدفوع'
+                          ? '✅ مدفوع'
                           : invoice.status === 'partial'
-                          ? 'جزئي'
-                          : 'غير مدفوع'}
+                          ? '⏳ جزئي'
+                          : '❌ غير مدفوع'}
                       </span>
                     </td>
                   </tr>
