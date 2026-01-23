@@ -96,13 +96,19 @@ export default function FamilyTreeView() {
 
     const generations: Generation[] = []
     const householdLevels = new Map<string, number>()
-    const visited = new Set<string>()
+    const processed = new Set<string>()
 
-    // حساب مستويات الأبناء مع حماية من الحلقات
-    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>) => {
+    // حساب مستويات الأبناء مع حماية قوية من الحلقات
+    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>, maxDepth: number = 100) => {
       // حماية من الحلقات الدائرية
       if (visitedInPath.has(householdId)) {
         console.warn(`Circular reference detected for household: ${householdId}`)
+        return
+      }
+
+      // حماية من العمق الزائد
+      if (currentLevel > maxDepth) {
+        console.warn(`Maximum depth exceeded for household: ${householdId} at level ${currentLevel}`)
         return
       }
 
@@ -113,35 +119,48 @@ export default function FamilyTreeView() {
       const newVisitedPath = new Set(visitedInPath)
       newVisitedPath.add(householdId)
 
-      // تحديث المستوى إذا كان أعلى
+      // تحديث المستوى إذا كان أعلى (نأخذ أعلى مستوى للأسرة)
       const existingLevel = householdLevels.get(householdId) ?? -1
       if (currentLevel > existingLevel) {
         householdLevels.set(householdId, currentLevel)
       }
 
-      // معالجة الأبناء
+      // معالجة الأبناء - نزور كل الأبناء حتى لو تمت زيارتهم من قبل
+      // لأن نفس الأسرة قد تكون في مستويات مختلفة عبر مسارات مختلفة
       household.childLinks.forEach((link) => {
         const childId = link.childHousehold?.id || link.childHouseholdId
-        if (childId && !visited.has(childId)) {
-          visited.add(childId)
-          processChildren(childId, currentLevel + 1, newVisitedPath)
+        if (childId) {
+          // نتحقق فقط من الحلقات الدائرية، وليس من الزيارة السابقة
+          if (!newVisitedPath.has(childId)) {
+            processChildren(childId, currentLevel + 1, newVisitedPath, maxDepth)
+          } else {
+            console.warn(`Skipping circular link: ${householdId} -> ${childId}`)
+          }
         }
       })
     }
 
     // معالجة الجذور
     roots.forEach((root) => {
-      if (!visited.has(root.id)) {
-        visited.add(root.id)
+      if (!processed.has(root.id)) {
+        processed.add(root.id)
         householdLevels.set(root.id, 0)
-        processChildren(root.id, 0, new Set())
+        processChildren(root.id, 0, new Set(), 100)
       }
     })
 
-    // معالجة الأسر التي لم يتم زيارتها (أسر بدون روابط)
+    // معالجة الأسر التي لم يتم زيارتها (أسر بدون روابط أو أسر معزولة)
     treeData.households.forEach((household) => {
       if (!householdLevels.has(household.id)) {
-        householdLevels.set(household.id, 0)
+        // إذا لم يكن للأسرة أي روابط، ضعها في المستوى 0
+        // إذا كان لها روابط لكن لم يتم زيارتها، قد تكون هناك مشكلة في البيانات
+        if (household.childLinks.length === 0 && household.parentLinks.length === 0) {
+          householdLevels.set(household.id, 0)
+        } else {
+          // أسرة لها روابط لكن لم يتم زيارتها - قد تكون في حلقة أو مشكلة في البيانات
+          console.warn(`Unvisited household with links: ${household.id}`)
+          householdLevels.set(household.id, 0) // ضعها في المستوى 0 كحل احتياطي
+        }
       }
     })
 
