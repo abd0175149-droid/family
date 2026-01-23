@@ -80,6 +80,18 @@ export class TreeService {
             },
           },
         },
+        childLinks: {
+          include: {
+            parentHousehold: true,
+            linkViaPerson: true,
+          },
+        },
+        parentLinks: {
+          include: {
+            childHousehold: true,
+            linkViaPerson: true,
+          },
+        },
       },
     })
 
