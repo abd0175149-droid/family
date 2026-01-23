@@ -15,16 +15,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import dagre from 'dagre'
 
-// تعريف types لـ dagre
-declare module 'dagre' {
-  interface GraphLabel {
-    rankdir?: 'TB' | 'LR' | 'BT' | 'RL'
-    nodesep?: number
-    ranksep?: number
-    align?: string
-  }
-}
-
 interface Person {
   id: string
   fullName: string
@@ -105,7 +95,7 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({ 
-    rankdir: direction,
+    rankdir: direction as string,
     nodesep: 100,
     ranksep: 150,
     align: 'UL',
