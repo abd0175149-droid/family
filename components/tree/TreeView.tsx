@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import FamilyTreeView from './FamilyTreeView'
+import FamilyTreeViewNew from './FamilyTreeViewNew'
 import GridTreeView from './GridTreeView'
 
 type ViewMode = 'tree' | 'grid'
@@ -14,12 +14,12 @@ export default function TreeView() {
       {/* View Mode Toggle */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
             الشجرة العائلية
           </h1>
           <p className="text-slate-600 dark:text-slate-400">استكشف روابط العائلة وعلاقاتها</p>
         </div>
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-xl p-1 border border-slate-200/50 dark:border-slate-800/50">
+        <div className="glass-effect rounded-lg p-1 elegant-border">
           <button
             onClick={() => setViewMode('tree')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
@@ -43,7 +43,7 @@ export default function TreeView() {
         </div>
       </div>
 
-      {viewMode === 'tree' ? <FamilyTreeView /> : <GridTreeView />}
+      {viewMode === 'tree' ? <FamilyTreeViewNew /> : <GridTreeView />}
     </div>
   )
 }

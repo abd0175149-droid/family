@@ -36,6 +36,33 @@ export interface LinkHouseholdsData {
 
 export class TreeService {
   static async getTreeStructure() {
+    // جلب الأشخاص مع معلومات الأب والأم
+    const persons = await prisma.person.findMany({
+      include: {
+        photoFile: true,
+        father: {
+          select: { id: true, fullName: true },
+        },
+        mother: {
+          select: { id: true, fullName: true },
+        },
+        primaryFamily: {
+          include: {
+            members: {
+              include: {
+                person: {
+                  include: {
+                    photoFile: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    // جلب الأسر مع أعضائها
     const households = await prisma.household.findMany({
       include: {
         members: {
@@ -43,20 +70,14 @@ export class TreeService {
             person: {
               include: {
                 photoFile: true,
+                father: {
+                  select: { id: true, fullName: true },
+                },
+                mother: {
+                  select: { id: true, fullName: true },
+                },
               },
             },
-          },
-        },
-        childLinks: {
-          include: {
-            parentHousehold: true,
-            linkViaPerson: true,
-          },
-        },
-        parentLinks: {
-          include: {
-            childHousehold: true,
-            linkViaPerson: true,
           },
         },
       },
@@ -69,8 +90,23 @@ export class TreeService {
       },
     })
 
+    // تحويل households إلى families format للتوافق
+    const families = households.map((household) => ({
+      id: household.id,
+      title: household.title,
+      members: household.members.map((member) => ({
+        person: member.person,
+        role: member.role,
+        isPrimarySpouse: member.isPrimarySpouse,
+      })),
+      childLinks: household.childLinks || [],
+      parentLinks: household.parentLinks || [],
+    }))
+
     return {
-      households,
+      persons,
+      families,
+      households, // للتوافق مع الكود القديم
       relationships,
     }
   }
