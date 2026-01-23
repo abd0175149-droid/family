@@ -102,23 +102,39 @@ export class TreeService {
       },
     })
 
-    // تحويل households إلى families format للتوافق
+    // تحويل households إلى families. الروابط كـ IDs فقط (بدون كائنات متداخلة)
+    // لمنع مراجع دائرية → Maximum call stack في الواجهة.
     const families = households.map((household) => ({
       id: household.id,
       title: household.title,
       members: household.members.map((member) => ({
-        person: member.person,
+        id: `${household.id}-${member.personId}`,
+        person: {
+          id: member.person.id,
+          fullName: member.person.fullName,
+          gender: member.person.gender,
+          birthDate: member.person.birthDate?.toISOString?.() ?? null,
+          fatherId: member.person.fatherId ?? undefined,
+          motherId: member.person.motherId ?? undefined,
+          primaryFamilyId: member.person.primaryFamilyId ?? undefined,
+        },
         role: member.role,
-        isPrimarySpouse: member.isPrimarySpouse,
+        isPrimarySpouse: member.isPrimarySpouse ?? false,
       })),
-      childLinks: household.childLinks || [],
-      parentLinks: household.parentLinks || [],
+      childLinks: (household.childLinks || []).map((l) => ({
+        childHouseholdId: l.childHouseholdId,
+        parentHouseholdId: l.parentHouseholdId,
+      })),
+      parentLinks: (household.parentLinks || []).map((l) => ({
+        childHouseholdId: l.childHouseholdId,
+        parentHouseholdId: l.parentHouseholdId,
+      })),
     }))
 
     return {
       persons,
       families,
-      households, // للتوافق مع الكود القديم
+      households: families, // نفس البنية المُصحّحة (بدون تداخل) للتوافق
       relationships,
     }
   }

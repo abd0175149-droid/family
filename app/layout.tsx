@@ -21,29 +21,39 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // معالجة ChunkLoadError تلقائياً
-              if (typeof window !== 'undefined') {
-                window.addEventListener('error', function(event) {
-                  if (event.error?.name === 'ChunkLoadError' || 
-                      event.message?.includes('Loading chunk') ||
-                      event.message?.includes('Failed to fetch dynamically imported module')) {
-                    console.warn('ChunkLoadError detected, reloading page...');
-                    setTimeout(function() {
-                      window.location.reload();
-                    }, 1000);
-                  }
-                });
-                
-                window.addEventListener('unhandledrejection', function(event) {
-                  if (event.reason?.name === 'ChunkLoadError' || 
-                      event.reason?.message?.includes('Loading chunk')) {
-                    console.warn('ChunkLoadError in promise, reloading page...');
-                    setTimeout(function() {
-                      window.location.reload();
-                    }, 1000);
-                  }
-                });
-              }
+(function() {
+  var key = 'chunk_reload_cnt';
+  if (typeof window !== 'undefined' && window.location.search.indexOf('_nc=') >= 0) {
+    try { sessionStorage.removeItem(key); } catch (_) {}
+  }
+  function isChunkError(e) {
+    if (!e) return false;
+    var msg = (e.message || (e.reason && e.reason.message) || '') + '';
+    var name = (e.name || (e.reason && e.reason.name) || '') + '';
+    return name === 'ChunkLoadError' || msg.indexOf('Loading chunk') >= 0 || msg.indexOf('Failed to fetch dynamically imported module') >= 0;
+  }
+  function reloadWithoutCache() {
+    var n = parseInt(sessionStorage.getItem(key) || '0', 10);
+    if (n >= 1) return false;
+    sessionStorage.setItem(key, String(n + 1));
+    var u = new URL(window.location.href);
+    u.searchParams.set('_nc', Date.now());
+    window.location.replace(u.toString());
+    return true;
+  }
+  window.addEventListener('error', function(ev) {
+    if (isChunkError(ev.error) || (ev.message && ev.message.indexOf('Loading chunk') >= 0)) {
+      if (ev.preventDefault) ev.preventDefault();
+      reloadWithoutCache();
+    }
+  }, true);
+  window.addEventListener('unhandledrejection', function(ev) {
+    if (isChunkError(ev.reason)) {
+      if (ev.preventDefault) ev.preventDefault();
+      reloadWithoutCache();
+    }
+  }, true);
+})();
             `,
           }}
         />

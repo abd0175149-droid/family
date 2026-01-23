@@ -33,8 +33,6 @@ interface Family {
     role: string
     isPrimarySpouse?: boolean
   }>
-  childLinks?: any[]
-  parentLinks?: any[]
 }
 
 interface TreeData {
@@ -194,21 +192,23 @@ export default function FamilyTreeViewVertical() {
       if (processedFamilies.has(family.id)) return
       processedFamilies.add(family.id)
 
-      // تحويل household إلى family format إذا لزم الأمر
+      // تحويل household إلى family format. لا نخزن childLinks/parentLinks في العقدة
+      // (تحتوي على كائنات متداخلة دائرية → Maximum call stack)
       const familyData: Family = {
         id: family.id,
         title: family.title,
-        members: family.members?.map((m: any) => ({
-          person: m.person || {
-            id: m.personId,
-            fullName: m.person?.fullName || '',
-            gender: m.person?.gender || '',
+        members: (family.members || []).map((m: any) => ({
+          person: {
+            id: m.person?.id ?? m.personId,
+            fullName: m.person?.fullName ?? '',
+            gender: m.person?.gender ?? '',
+            fatherId: m.person?.fatherId,
+            motherId: m.person?.motherId,
+            primaryFamilyId: m.person?.primaryFamilyId,
           },
           role: m.role,
           isPrimarySpouse: m.isPrimarySpouse,
-        })) || [],
-        childLinks: family.childLinks || [],
-        parentLinks: family.parentLinks || [],
+        })),
       }
 
       familyNodes.push({

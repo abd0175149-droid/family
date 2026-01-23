@@ -24,13 +24,19 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: any) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
-    
-    // إذا كان ChunkLoadError، حاول إعادة تحميل الصفحة
+
     if (error.name === 'ChunkLoadError' || error.message?.includes('Loading chunk')) {
-      // انتظر قليلاً ثم أعد تحميل الصفحة
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+      try {
+        const key = 'chunk_reload_cnt'
+        const n = parseInt(sessionStorage.getItem(key) || '0', 10)
+        if (n < 1) {
+          sessionStorage.setItem(key, '1')
+          const u = new URL(window.location.href)
+          u.searchParams.set('_nc', String(Date.now()))
+          setTimeout(() => window.location.replace(u.toString()), 800)
+          return
+        }
+      } catch (_) {}
     }
   }
 
@@ -40,7 +46,6 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback
       }
 
-      // إذا كان ChunkLoadError، عرض رسالة مع إعادة تحميل
       if (this.state.error?.name === 'ChunkLoadError' || this.state.error?.message?.includes('Loading chunk')) {
         return (
           <div className="flex items-center justify-center min-h-screen p-4">
