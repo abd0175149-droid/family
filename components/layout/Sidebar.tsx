@@ -23,21 +23,25 @@ const menuItems: Record<string, SidebarItem[]> = {
     { label: 'المالية', href: '/finance', icon: '💰' },
     { label: 'الاجتماعات', href: '/meetings', icon: '📋' },
     { label: 'المستخدمين', href: '/admin/users', icon: '👥' },
+    { label: 'الملف الشخصي', href: '/profile', icon: '👤' },
   ],
   secretary: [
     { label: 'الشجرة', href: '/tree', icon: '🌳' },
     { label: 'الاجتماعات', href: '/meetings', icon: '📋' },
     { label: 'المستخدمين', href: '/admin/users', icon: '👥' },
+    { label: 'الملف الشخصي', href: '/profile', icon: '👤' },
   ],
   treasurer: [
     { label: 'المالية', href: '/finance', icon: '💰' },
     { label: 'الشجرة', href: '/tree', icon: '🌳' },
     { label: 'الاجتماعات', href: '/meetings', icon: '📋' },
+    { label: 'الملف الشخصي', href: '/profile', icon: '👤' },
   ],
   member: [
     { label: 'الشجرة', href: '/tree', icon: '🌳' },
     { label: 'دفعاتي', href: '/my-finance', icon: '💳' },
     { label: 'الاجتماعات', href: '/meetings', icon: '📋' },
+    { label: 'الملف الشخصي', href: '/profile', icon: '👤' },
   ],
 }
 
