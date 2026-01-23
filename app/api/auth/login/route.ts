@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     setAuthCookie(response, token)
 
     return response
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors[0].message },
@@ -64,8 +64,17 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Login error:', error)
+    
+    // إرجاع تفاصيل الخطأ في development
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? error.message || 'حدث خطأ أثناء تسجيل الدخول'
+      : 'حدث خطأ أثناء تسجيل الدخول'
+    
     return NextResponse.json(
-      { error: 'حدث خطأ أثناء تسجيل الدخول' },
+      { 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     )
   }

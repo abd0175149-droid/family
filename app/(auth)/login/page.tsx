@@ -28,10 +28,12 @@ export default function LoginPage() {
         router.push('/tree')
         router.refresh()
       } else {
-        setError(data.error || 'حدث خطأ أثناء تسجيل الدخول')
+        setError(data.error || data.message || 'حدث خطأ أثناء تسجيل الدخول')
+        console.error('Login error:', data)
       }
-    } catch (error) {
-      setError('حدث خطأ أثناء تسجيل الدخول')
+    } catch (error: any) {
+      console.error('Login error:', error)
+      setError(error.message || 'حدث خطأ أثناء تسجيل الدخول. تحقق من اتصال الإنترنت.')
     } finally {
       setLoading(false)
     }
