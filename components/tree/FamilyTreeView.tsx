@@ -83,8 +83,21 @@ export default function FamilyTreeView() {
   const generations = useMemo(() => {
     if (!treeData || treeData.households.length === 0) return []
 
-    const householdMap = new Map<string, Household>()
-    treeData.households.forEach((h) => householdMap.set(h.id, h))
+    // إنشاء خريطة بسيطة للأسر بدون بيانات متداخلة
+    const householdMap = new Map<string, { id: string; childIds: string[] }>()
+    
+    // بناء خريطة بسيطة من childLinks فقط (بدون nested data)
+    treeData.households.forEach((h) => {
+      const childIds: string[] = []
+      h.childLinks.forEach((link) => {
+        // استخدام childHouseholdId مباشرة، وليس childHousehold object
+        const childId = link.childHouseholdId || (link.childHousehold?.id)
+        if (childId && childId !== h.id) { // منع self-reference
+          childIds.push(childId)
+        }
+      })
+      householdMap.set(h.id, { id: h.id, childIds })
+    })
 
     // إيجاد الجذور (الأسر بدون آباء)
     const rootHouseholds = treeData.households.filter(
@@ -96,75 +109,64 @@ export default function FamilyTreeView() {
 
     const generations: Generation[] = []
     const householdLevels = new Map<string, number>()
+    const processedInThisRun = new Set<string>()
 
     // حساب مستويات الأبناء مع حماية قوية من الحلقات
-    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>, maxDepth: number = 50) => {
+    const processChildren = (householdId: string, currentLevel: number, visitedInPath: Set<string>, maxDepth: number = 20) => {
       // حماية من الحلقات الدائرية
       if (visitedInPath.has(householdId)) {
-        console.warn(`Circular reference detected for household: ${householdId}`)
-        return
+        return // توقف فوراً بدون console.warn لتجنب spam
       }
 
       // حماية من العمق الزائد
       if (currentLevel > maxDepth) {
-        console.warn(`Maximum depth exceeded for household: ${householdId} at level ${currentLevel}`)
-        return
+        return // توقف فوراً
       }
 
-      const household = householdMap.get(householdId)
-      if (!household) return
+      const householdData = householdMap.get(householdId)
+      if (!householdData) return
 
       // إضافة للزيارة في هذا المسار
       const newVisitedPath = new Set(visitedInPath)
       newVisitedPath.add(householdId)
 
-      // تحديث المستوى إذا كان أعلى (نأخذ أعلى مستوى للأسرة)
+      // تحديث المستوى إذا كان أعلى
       const existingLevel = householdLevels.get(householdId) ?? -1
       if (currentLevel > existingLevel) {
         householdLevels.set(householdId, currentLevel)
       }
 
-      // معالجة الأبناء - نزور كل الأبناء حتى لو تمت زيارتهم من قبل
-      // لأن نفس الأسرة قد تكون في مستويات مختلفة عبر مسارات مختلفة
-      // لكن نتحقق من الحلقات الدائرية فقط
-      household.childLinks.forEach((link) => {
-        const childId = link.childHousehold?.id || link.childHouseholdId
-        if (childId) {
-          // نتحقق فقط من الحلقات الدائرية في المسار الحالي
-          if (!newVisitedPath.has(childId)) {
-            processChildren(childId, currentLevel + 1, newVisitedPath, maxDepth)
-          } else {
-            console.warn(`Skipping circular link: ${householdId} -> ${childId}`)
-          }
+      // معالجة الأبناء - استخدام childIds فقط (بدون nested objects)
+      householdData.childIds.forEach((childId) => {
+        // نتحقق فقط من الحلقات الدائرية في المسار الحالي
+        if (!newVisitedPath.has(childId)) {
+          processChildren(childId, currentLevel + 1, newVisitedPath, maxDepth)
         }
       })
     }
 
     // معالجة الجذور - نبدأ من كل جذر بشكل منفصل
     roots.forEach((root) => {
-      // نبدأ من كل جذر بمسار جديد
-      householdLevels.set(root.id, 0)
-      processChildren(root.id, 0, new Set(), 50)
+      if (!processedInThisRun.has(root.id)) {
+        processedInThisRun.add(root.id)
+        householdLevels.set(root.id, 0)
+        processChildren(root.id, 0, new Set(), 20)
+      }
     })
 
     // معالجة الأسر التي لم يتم زيارتها (أسر بدون روابط أو أسر معزولة)
     treeData.households.forEach((household) => {
       if (!householdLevels.has(household.id)) {
-        // إذا لم يكن للأسرة أي روابط، ضعها في المستوى 0
-        // إذا كان لها روابط لكن لم يتم زيارتها، قد تكون هناك مشكلة في البيانات
-        if (household.childLinks.length === 0 && household.parentLinks.length === 0) {
-          householdLevels.set(household.id, 0)
-        } else {
-          // أسرة لها روابط لكن لم يتم زيارتها - قد تكون في حلقة أو مشكلة في البيانات
-          console.warn(`Unvisited household with links: ${household.id}`)
-          householdLevels.set(household.id, 0) // ضعها في المستوى 0 كحل احتياطي
-        }
+        // ضع جميع الأسر غير المزورة في المستوى 0
+        householdLevels.set(household.id, 0)
       }
     })
 
-    // تجميع الأسر حسب المستوى
-    const maxLevel = Math.max(...Array.from(householdLevels.values()), 0)
-    for (let i = 0; i <= maxLevel; i++) {
+    // تجميع الأسر حسب المستوى - مع حماية من maxLevel = -Infinity
+    const levelValues = Array.from(householdLevels.values())
+    const maxLevel = levelValues.length > 0 ? Math.max(...levelValues, 0) : 0
+    
+    for (let i = 0; i <= maxLevel && i < 100; i++) { // حماية إضافية: max 100 level
       const households = treeData.households.filter(
         (h) => householdLevels.get(h.id) === i
       )
@@ -343,12 +345,14 @@ function HouseholdCard({
   const wives = household.members.filter((m) => m.role === 'wife')
   const children = household.members.filter((m) => m.role === 'child')
 
-  // إيجاد الأسر المرتبطة
-  const childHouseholds = household.childLinks.map((link) => {
-    const childId = link.childHousehold?.id || link.childHouseholdId
-    const childHousehold = treeData.households.find((h) => h.id === childId)
-    return childHousehold
-  }).filter(Boolean) as Household[]
+  // إيجاد الأسر المرتبطة - استخدام childHouseholdId مباشرة
+  const childHouseholds = household.childLinks
+    .map((link) => {
+      const childId = link.childHouseholdId || link.childHousehold?.id
+      if (!childId) return null
+      return treeData.households.find((h) => h.id === childId)
+    })
+    .filter((h): h is Household => h !== null && h !== undefined)
 
   return (
     <div
