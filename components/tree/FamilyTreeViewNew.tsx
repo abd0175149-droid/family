@@ -11,6 +11,7 @@ import ReactFlow, {
   useEdgesState,
   ConnectionMode,
   Panel,
+  Position,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import dagre from 'dagre'
@@ -113,8 +114,8 @@ function getLayoutedElements(nodes: Node[], edges: Edge[], direction: 'TB' | 'LR
 
   nodes.forEach((node) => {
     const nodeWithPosition = dagreGraph.node(node.id)
-    node.targetPosition = 'top'
-    node.sourcePosition = 'bottom'
+    node.targetPosition = Position.Top
+    node.sourcePosition = Position.Bottom
     node.position = {
       x: nodeWithPosition.x - 110,
       y: nodeWithPosition.y - 75,
