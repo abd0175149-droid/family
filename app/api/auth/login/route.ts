@@ -71,16 +71,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Login error:', error)
+    console.error('Error stack:', error.stack)
+    console.error('Error name:', error.name)
+    console.error('Error message:', error.message)
     
-    // إرجاع تفاصيل الخطأ في development
-    const errorMessage = process.env.NODE_ENV === 'development' 
-      ? error.message || 'حدث خطأ أثناء تسجيل الدخول'
-      : 'حدث خطأ أثناء تسجيل الدخول'
-    
+    // إرجاع تفاصيل الخطأ مؤقتاً للتصحيح
     return NextResponse.json(
       { 
-        error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        error: 'حدث خطأ أثناء تسجيل الدخول',
+        details: error.message || 'Unknown error',
+        type: error.name || 'Error',
       },
       { status: 500 }
     )
