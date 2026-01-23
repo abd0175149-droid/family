@@ -3,7 +3,6 @@ const path = require('path')
 
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   images: {
     domains: ['localhost', 'myfamily.grade.sbs'],
   },
