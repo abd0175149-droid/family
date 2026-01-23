@@ -3,11 +3,13 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    // Test database connection with timeout
-    await Promise.race([
-      prisma.$queryRaw`SELECT 1`,
+    // Test database connection with timeout and error handling
+    const connectionTest = await Promise.race([
+      prisma.user.count().catch(() => {
+        throw new Error('Database query failed')
+      }),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 5000)
+        setTimeout(() => reject(new Error('Connection timeout')), 3000)
       )
     ])
     
@@ -15,15 +17,14 @@ export async function GET() {
       status: 'ok',
       database: 'connected',
       timestamp: new Date().toISOString(),
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
     })
   } catch (error: any) {
-    // محاولة إعادة الاتصال
-    try {
-      await prisma.$disconnect().catch(() => {})
-      await prisma.$connect().catch(() => {})
-    } catch (retryError) {
-      // تجاهل أخطاء إعادة الاتصال
-    }
+    // لا نحاول إعادة الاتصال هنا لتجنب تعطل السيرفر
+    console.error('Health check error:', error)
     
     return NextResponse.json(
       {
@@ -32,7 +33,12 @@ export async function GET() {
         error: process.env.NODE_ENV === 'development' ? error.message : 'Database connection failed',
         timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
     )
   }
 }
