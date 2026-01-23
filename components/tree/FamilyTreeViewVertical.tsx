@@ -335,7 +335,6 @@ export default function FamilyTreeViewVertical() {
           color="#d4d4d4" 
           gap={20}
           size={1}
-          variant="dots"
         />
         <Controls 
           className="elegant-shadow rounded-lg bg-white dark:bg-slate-900 elegant-border" 
