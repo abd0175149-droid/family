@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
+import ErrorBoundaryWrapper from '@/components/ErrorBoundaryWrapper'
 
 export const metadata: Metadata = {
   title: 'منصة عائلية',
@@ -49,9 +49,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ErrorBoundary>
+        <ErrorBoundaryWrapper>
           {children}
-        </ErrorBoundary>
+        </ErrorBoundaryWrapper>
       </body>
     </html>
   )
