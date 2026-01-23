@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import ReactFlow, {
   Node,
   Edge,
@@ -162,6 +162,12 @@ export default function FamilyTreeViewVertical() {
       })
       .catch((error) => {
         console.error('Error fetching tree:', error)
+        // معالجة ChunkLoadError
+        if (error?.name === 'ChunkLoadError' || error?.message?.includes('Loading chunk')) {
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
         setLoading(false)
       })
   }, [])

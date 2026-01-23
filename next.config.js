@@ -40,6 +40,10 @@ const nextConfig = {
   },
   // منع الكاش للصفحات الديناميكية
   generateEtags: false,
+  // إضافة build ID ديناميكي لمنع مشاكل الكاش
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
