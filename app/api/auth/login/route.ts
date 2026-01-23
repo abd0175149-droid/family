@@ -23,15 +23,27 @@ export async function POST(request: NextRequest) {
 
     console.log('Login attempt for:', email)
 
-    // التحقق من الاتصال بقاعدة البيانات أولاً
+    // التحقق من الاتصال بقاعدة البيانات أولاً (مع timeout)
     try {
-      await prisma.$queryRaw`SELECT 1`
+      await Promise.race([
+        prisma.$queryRaw`SELECT 1`,
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+        )
+      ])
     } catch (dbError: any) {
       console.error('Database connection error:', dbError)
+      // إعادة محاولة الاتصال مرة واحدة
+      try {
+        await prisma.$disconnect()
+        await prisma.$connect()
+      } catch (retryError) {
+        console.error('Retry connection failed:', retryError)
+      }
       return NextResponse.json(
         { 
           error: 'خطأ في الاتصال بقاعدة البيانات',
-          details: dbError.message 
+          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
         },
         { status: 500 }
       )
