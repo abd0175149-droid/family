@@ -243,7 +243,8 @@ export default function FamilyTreeViewNew() {
     )
   }
 
-  if (!treeData || treeData.families.length === 0) {
+  const families = treeData?.families || treeData?.households || []
+  if (!treeData || !families || families.length === 0) {
     return (
       <div className="elegant-border rounded-lg bg-white dark:bg-slate-900 p-12 text-center elegant-shadow">
         <div className="text-5xl mb-4">🌳</div>
