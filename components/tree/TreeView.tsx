@@ -1,84 +1,49 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import FamilyTreeView from './FamilyTreeView'
+import GridTreeView from './GridTreeView'
 
-interface Household {
-  id: string
-  title?: string
-  members: Array<{
-    id: string
-    person: {
-      id: string
-      fullName: string
-      gender: string
-    }
-    role: string
-  }>
-  childLinks: Array<{
-    childHousehold: { id: string }
-  }>
-  parentLinks: Array<{
-    parentHousehold: { id: string }
-  }>
-}
-
-interface TreeData {
-  households: Household[]
-  relationships: any[]
-}
+type ViewMode = 'tree' | 'grid'
 
 export default function TreeView() {
-  const [treeData, setTreeData] = useState<TreeData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch('/api/tree')
-      .then((res) => res.json())
-      .then((data) => {
-        setTreeData(data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching tree:', error)
-        setLoading(false)
-      })
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
-          <p className="text-slate-600 dark:text-slate-400 font-medium">جاري تحميل الشجرة...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!treeData || treeData.households.length === 0) {
-    return (
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-12 text-center border border-slate-200/50 dark:border-slate-800/50">
-        <div className="text-6xl mb-4">🌳</div>
-        <p className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">لا توجد بيانات في الشجرة</p>
-        <p className="text-slate-500 dark:text-slate-400">ابدأ بإضافة أسر جديدة</p>
-      </div>
-    )
-  }
+  const [viewMode, setViewMode] = useState<ViewMode>('tree')
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
-          الشجرة العائلية
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">استكشف روابط العائلة وعلاقاتها</p>
+      {/* View Mode Toggle */}
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+            الشجرة العائلية
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400">استكشف روابط العائلة وعلاقاتها</p>
+        </div>
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-xl p-1 border border-slate-200/50 dark:border-slate-800/50">
+          <button
+            onClick={() => setViewMode('tree')}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              viewMode === 'tree'
+                ? 'gradient-primary text-white shadow-glow'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            🌳 شجرة
+          </button>
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              viewMode === 'grid'
+                ? 'gradient-primary text-white shadow-glow'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            📋 شبكة
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {treeData.households.map((household, index) => (
-          <HouseholdNode key={household.id} household={household} index={index} />
-        ))}
-      </div>
+      {viewMode === 'tree' ? <FamilyTreeView /> : <GridTreeView />}
     </div>
   )
 }
