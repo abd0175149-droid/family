@@ -65,12 +65,18 @@ function buildHierarchy(families: Family[]): TreeNode[] {
 // • الخروج إلى الأبناء من منتصف القوس؛ منحنى نازل ثم تفرع سلس؛ غصن ينحني قليلاً للأعلى، ينتهي قبل الاسم.
 // • كل جيل أدنى = خطوط أنحف. التوازن وتجنب التقاطع عبر d3.tree.
 // • كل اسم داخل تشبّس (chip) بحيز ثابت — منع تداخل الأسماء.
+//
+// ——— تحليل الصورة المرجعية وكيف تُنتَج الشجرة ———
+// 1. العُقد: تشبّسان مستطيلان مُدَوَّران (chips)، خلفية كريمية #FFF8EF، حدود برتقالية #CC561E، سماكة متوسطة.
+// 2. القوس: منحنى أفقي مقعّر للأسفل، نفس اللون البرتقالي، سميك؛ يبدأ وينتهي بفجوة عن التشبّسات (لا يلامسها).
+// 3. العنوان: نص مركّز تحت منتصف القوس فقط (مثل «توفيق») — اسم الأسرة أو نقطة خروج الأبناء.
+// 4. الخلفية: داكنة (#1a1e29) في الوضع الداكن؛ كريمية فاتحة في الوضع الفاتح.
 const NAME_GAP = 58           // نصف المسافة بين مركزي التشبّسين (ذكر يمين، أنثى يسار)
 const ARC_DEPTH = 14          // عمق القوس الزوجي (مقعّر للأسفل)
-const ARC_CLEAR = 8           // بداية/نهاية القوس لا تلامس التشبّسات
+const ARC_CLEAR = 10          // بداية/نهاية القوس لا تلامس التشبّسات (فجوة واضحة كما في الصورة)
 const BRANCH_END_GAP = 24     // نهاية الغصن قبل التشبّس (مسافة بيضاء)
 const DROP = 70               // هبوط المنحنى قبل التفرع
-const STROKE_MARRIAGE = 2.2   // سماكة القوس الزوجي
+const STROKE_MARRIAGE = 2.5   // سماكة القوس الزوجي (واضحة كما في الصورة)
 const STROKE_BRANCH = 2       // سماكة الأغصان (أخف مع العمق)
 const FONT_NAME = 11
 const FONT_TITLE = 10
@@ -79,6 +85,10 @@ const CHIP_HEIGHT = 22        // ارتفاع التشبّس
 const CHIP_RX = 10            // تقويس زوايا التشبّس
 const CHIP_PAD = 6            // padding أفقي داخل التشبّس
 const MAX_CHIP_CHARS = 9      // أقصى حروف قبل القص بـ …
+const CHIP_FILL = '#FFF8EF'   // كريمي فاتح — مطابق للصورة
+const CHIP_FILL_SEL = '#FEF3E2'
+const ARC_ORANGE = '#CC561E'  // برتقالي محروق — حدود والقوس
+const ARC_BURGUNDY = '#AA2B1D'
 
 /** قوس زوجي أفقي مقعّر للأسفل — من اليمين (ذكر) إلى اليسار (أنثى). لا يلامس التشبّسات. */
 function marriageArcPath(cx: number, cy: number, halfGap: number, arcDepth: number, clear: number): string {
@@ -220,24 +230,24 @@ export default function D3FamilyTree() {
       const wife = wives[0] ?? ''
       const gNode = d3.select(this)
 
-      // قوس زواج: أفقي، مقعّر للأسفل، لا يلامس الأسماء
+      // قوس زواج: أفقي، مقعّر للأسفل، فجوة واضحة عن التشبّسات (كما في الصورة)
       gNode
         .append('path')
         .attr('d', marriageArcPath(cx, cy, NAME_GAP, ARC_DEPTH, ARC_CLEAR))
         .attr('fill', 'none')
-        .attr('stroke', (d: any) => (d.data.id === selectedId ? '#CC561E' : '#AA2B1D'))
+        .attr('stroke', (d: any) => (d.data.id === selectedId ? ARC_ORANGE : ARC_BURGUNDY))
         .attr('stroke-width', STROKE_MARRIAGE)
-        .attr('stroke-opacity', 0.9)
+        .attr('stroke-opacity', 0.95)
         .attr('stroke-linecap', 'round')
         .each(function () {
           d3.select(this).append('title').text('رابطة زواج / أسرة')
         })
 
-      // تشبّسات بأحجام ثابتة — حماية من التداخل. الذكر يمين، الأنثى يسار.
+      // تشبّسات — كريمي #FFF8EF، حدود برتقالية. الذكر يمين، الأنثى يسار.
       const sel = (d: any) => d.data.id === selectedId
-      const chipFill = (d: any) => (sel(d) ? '#fef3e2' : '#f5f0eb')
-      const chipStroke = (d: any) => (sel(d) ? '#CC561E' : '#AA2B1D')
-      const chipStrokeOpacity = (d: any) => (sel(d) ? 1 : 0.6)
+      const chipFill = (d: any) => (sel(d) ? CHIP_FILL_SEL : CHIP_FILL)
+      const chipStroke = (d: any) => (sel(d) ? ARC_ORANGE : ARC_BURGUNDY)
+      const chipStrokeOpacity = (d: any) => (sel(d) ? 1 : 0.7)
       const textFill = (d: any) => (sel(d) ? '#1a1a1a' : '#2d2d2d')
 
       if (husband) {
@@ -251,7 +261,7 @@ export default function D3FamilyTree() {
           .attr('rx', CHIP_RX)
           .attr('fill', chipFill as any)
           .attr('stroke', chipStroke as any)
-          .attr('stroke-width', 1.2)
+          .attr('stroke-width', 1.5)
           .attr('stroke-opacity', chipStrokeOpacity as any)
         chip
           .append('text')
@@ -275,7 +285,7 @@ export default function D3FamilyTree() {
           .attr('rx', CHIP_RX)
           .attr('fill', chipFill as any)
           .attr('stroke', chipStroke as any)
-          .attr('stroke-width', 1.2)
+          .attr('stroke-width', 1.5)
           .attr('stroke-opacity', chipStrokeOpacity as any)
         chip
           .append('text')
@@ -289,30 +299,20 @@ export default function D3FamilyTree() {
           .text(clipForChip(wife, MAX_CHIP_CHARS))
       }
 
-      // عنوان اختياري صغير تحت منتصف القوس (تشبّس صغير أيضاً)
+      // عنوان الأسرة تحت منتصف القوس — نص مركّز فقط (مثل «توفيق» في الصورة)، نقطة خروج الأبناء
       if (f.title && (husband || wife)) {
-        const t = clipForChip(f.title, 10)
-        const tw = Math.min(t.length * 6.5, 56)
-        const th = 16
-        const titleChip = gNode.append('g').attr('class', 'title-chip')
-        titleChip
-          .append('rect')
-          .attr('x', cx - tw / 2)
-          .attr('y', cy + ARC_DEPTH + 6)
-          .attr('width', tw)
-          .attr('height', th)
-          .attr('rx', 6)
-          .attr('fill', 'rgba(0,0,0,0.04)')
-          .attr('stroke', 'rgba(0,0,0,0.08)')
-          .attr('stroke-width', 1)
-        titleChip
+        const t = clipForChip(f.title, 12)
+        const labelY = cy + ARC_DEPTH + 18
+        const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+        gNode
           .append('text')
           .attr('x', cx)
-          .attr('y', cy + ARC_DEPTH + 6 + th / 2)
+          .attr('y', labelY)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'central')
           .attr('font-size', FONT_TITLE)
-          .attr('fill', '#6b6b6b')
+          .attr('font-weight', '500')
+          .attr('fill', isDark ? '#d4d4d4' : '#6b6b6b')
           .text(t)
       }
     })
@@ -369,7 +369,7 @@ export default function D3FamilyTree() {
     <div className="space-y-4">
       <div
         ref={containerRef}
-        className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-[#faf8f5] dark:bg-gray-900 shadow-soft"
+        className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-[#faf8f5] dark:bg-[#1a1e29] shadow-soft"
         style={{ height: 'min(68vh, 720px)', minHeight: 520 }}
       >
         <svg ref={svgRef} className="block w-full h-full" style={{ minHeight: 520 }} />
