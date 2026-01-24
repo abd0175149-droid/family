@@ -52,9 +52,9 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 flex-col glass-effect border-r border-gray-200 dark:border-gray-800 shadow-soft">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+      <aside className="hidden lg:flex w-72 flex-col bg-primary-600 dark:bg-primary-800 border-r border-primary-500 dark:border-primary-700 shadow-soft">
+        <div className="p-6 border-b border-white/20">
+          <h2 className="text-lg font-bold text-white">
             القائمة الرئيسية
           </h2>
         </div>
@@ -70,24 +70,14 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                   'group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
                   'hover:scale-[1.02] active:scale-[0.98]',
                   isActive
-                    ? 'gradient-primary text-white shadow-glow'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/85 hover:bg-white/10'
                 )}
               >
-                <span className={cn(
-                  'text-xl transition-transform group-hover:scale-110',
-                  isActive && 'drop-shadow-lg'
-                )}>
-                  {item.icon}
-                </span>
-                <span className={cn(
-                  'font-medium',
-                  isActive ? 'text-white' : 'group-hover:text-primary-600 dark:group-hover:text-primary-400'
-                )}>
-                  {item.label}
-                </span>
+                <span className="text-xl">{item.icon}</span>
+                <span className="font-medium">{item.label}</span>
                 {isActive && (
-                  <div className="mr-auto w-2 h-2 rounded-full bg-white/80 animate-scale-in" />
+                  <div className="mr-auto w-2 h-2 rounded-full bg-white animate-scale-in" />
                 )}
               </Link>
             )
@@ -98,19 +88,16 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
       {/* Mobile Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 right-0 z-50 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl',
-          'border-l border-gray-200 dark:border-gray-800 shadow-2xl',
+          'fixed inset-y-0 right-0 z-50 w-72 bg-primary-600 dark:bg-primary-800 border-l border-primary-500 shadow-2xl',
           'transform transition-transform duration-300 ease-in-out lg:hidden',
           isMobileOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-            القائمة الرئيسية
-          </h2>
+        <div className="p-6 border-b border-white/20 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">القائمة الرئيسية</h2>
           <button
             onClick={onMobileClose}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
             aria-label="Close menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,27 +115,12 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                 onClick={onMobileClose}
                 className={cn(
                   'group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
-                  'hover:scale-[1.02] active:scale-[0.98]',
-                  isActive
-                    ? 'gradient-primary text-white shadow-glow'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
+                  isActive ? 'bg-white/20 text-white' : 'text-white/85 hover:bg-white/10'
                 )}
               >
-                <span className={cn(
-                  'text-xl transition-transform group-hover:scale-110',
-                  isActive && 'drop-shadow-lg'
-                )}>
-                  {item.icon}
-                </span>
-                <span className={cn(
-                  'font-medium',
-                  isActive ? 'text-white' : 'group-hover:text-primary-600 dark:group-hover:text-primary-400'
-                )}>
-                  {item.label}
-                </span>
-                {isActive && (
-                  <div className="mr-auto w-2 h-2 rounded-full bg-white/80 animate-scale-in" />
-                )}
+                <span className="text-xl">{item.icon}</span>
+                <span className="font-medium">{item.label}</span>
+                {isActive && <div className="mr-auto w-2 h-2 rounded-full bg-white animate-scale-in" />}
               </Link>
             )
           })}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import * as d3 from 'd3'
 
 interface Member {
   id: string
@@ -58,10 +59,47 @@ function buildHierarchy(families: Family[]): TreeNode[] {
   return rootFamilies.map(toNode)
 }
 
-const NODE_WIDTH = 200
-const NODE_HEIGHT = 100
-const DX = 220
-const DY = 160
+// ——— مواصفات الشجرة العضوية (الوصف النهائي الدقيق) ———
+// • لا خطوط مستقيمة ولا زوايا قائمة — منحنيات ناعمة فقط (قوس زواج + CatmullRom للأغصان).
+// • الزوج يمين، الزوجة يسار، نفس المستوى الأفقي؛ قوس أفقي مقعّر للأسفل (رابطة زواج)، لا يلامس الأسماء.
+// • الخروج إلى الأبناء من منتصف القوس؛ منحنى نازل ثم تفرع سلس؛ غصن ينحني قليلاً للأعلى، ينتهي قبل الاسم.
+// • كل جيل أدنى = خطوط أنحف. التوازن وتجنب التقاطع عبر d3.tree.
+const NAME_GAP = 52           // نصف المسافة بين الزوج والزوجة (الذكر يمين، الأنثى يسار)
+const ARC_DEPTH = 14          // عمق القوس الزوجي (مقعّر للأسفل)
+const ARC_CLEAR = 8           // بداية/نهاية القوس لا تلامس الأسماء
+const BRANCH_END_GAP = 22     // نهاية الغصن قبل الاسم (مسافة بيضاء)
+const DROP = 70               // هبوط المنحنى قبل التفرع
+const STROKE_MARRIAGE = 2.2   // سماكة القوس الزوجي
+const STROKE_BRANCH = 2       // سماكة الأغصان (أخف مع العمق)
+const FONT_NAME = 12
+const FONT_TITLE = 10
+
+/** قوس زوجي أفقي مقعّر للأسفل — من اليمين (ذكر) إلى اليسار (أنثى). لا يلامس الأسماء. */
+function marriageArcPath(cx: number, cy: number, halfGap: number, arcDepth: number, clear: number): string {
+  const right = cx + halfGap - clear
+  const left = cx - halfGap + clear
+  const cpY = cy + arcDepth
+  return `M ${right} ${cy} Q ${cx} ${cpY} ${left} ${cy}`
+}
+
+/** منحنى غصن عضوي: من منتصف القوس نزولاً ثم تفرع سلس، ينحني قليلاً للأعلى عند النهاية. لا خطوط مستقيمة. */
+function organicBranchPath(
+  px: number, py: number,
+  cx: number, cy: number,
+  endGap: number,
+  drop: number
+): string {
+  const ey = cy - endGap
+  const dx = cx - px
+  const pts: [number, number][] = [
+    [px, py],
+    [px + dx * 0.08, py + drop * 0.35],
+    [cx - dx * 0.08, ey + drop * 0.5],
+    [cx, ey],
+  ]
+  const line = d3.line().curve(d3.curveCatmullRom.alpha(0.6))
+  return line(pts) ?? `M ${px} ${py} C ${px} ${py + drop}, ${cx} ${ey + drop}, ${cx} ${ey}`
+}
 
 export default function D3FamilyTree() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -70,7 +108,6 @@ export default function D3FamilyTree() {
   const [error, setError] = useState<string | null>(null)
   const [treeData, setTreeData] = useState<TreeData | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [dim, setDim] = useState({ w: 800, h: 500 })
 
   useEffect(() => {
     fetch('/api/tree', { credentials: 'include' })
@@ -88,9 +125,6 @@ export default function D3FamilyTree() {
     const families = treeData.families ?? treeData.households ?? []
     if (families.length === 0) return
 
-    let cancelled = false
-    import('d3').then((d3) => {
-      if (cancelled || !svgRef.current) return
     const roots = buildHierarchy(families)
     if (roots.length === 0) return
 
@@ -99,129 +133,149 @@ export default function D3FamilyTree() {
       data: {} as Family,
       children: roots,
     }
-    const { w: width, h: height } = dim
-    const treeLayout = d3.tree().nodeSize([DY, DX])
-    const hierarchy = d3.hierarchy(virtualRoot as any, (d: TreeNode) => d.children)
+
+    const treeW = 880
+    const treeH = 560
+    const treeLayout = d3.tree<TreeNode>().size([treeW, treeH])
+    const hierarchy = d3.hierarchy(virtualRoot, (d) => d.children)
     treeLayout(hierarchy as any)
 
     const nodes = hierarchy.descendants().filter((d: any) => d.data.id !== '_root')
-    const links = hierarchy.links().filter((l: any) => (l.source as any).data.id !== '_root' && (l.target as any).data.id !== '_root')
+    const links = hierarchy.links().filter(
+      (l: any) => (l.source as any).data.id !== '_root' && (l.target as any).data.id !== '_root'
+    )
+
     const minX = nodes.length ? Math.min(...nodes.map((d: any) => d.x)) : 0
     const maxX = nodes.length ? Math.max(...nodes.map((d: any) => d.x)) : 0
     const minY = nodes.length ? Math.min(...nodes.map((d: any) => d.y)) : 0
     const maxY = nodes.length ? Math.max(...nodes.map((d: any) => d.y)) : 0
-    const pad = 40
-    const viewW = Math.max(width, maxY - minY + pad * 2)
-    const viewH = Math.max(height, maxX - minX + pad * 2)
+    const pad = 56
+    const viewW = Math.max(800, maxY - minY + pad * 2)
+    const viewH = Math.max(520, maxX - minX + pad * 2)
 
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
-    svg.attr('viewBox', `0 0 ${viewW} ${viewH}`).attr('width', '100%')
+    svg.attr('viewBox', `0 0 ${viewW} ${viewH}`).attr('width', '100%').attr('height', '100%')
 
     const gZoom = svg.append('g')
     const g = gZoom.append('g').attr('transform', `translate(${pad - minY},${pad - minX})`)
 
-    const zoom = d3.zoom().scaleExtent([0.2, 3]).on('zoom', (ev: any) => {
-      gZoom.attr('transform', ev.transform)
+    const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.2, 2.8]).on('zoom', (ev) => {
+      gZoom.attr('transform', ev.transform as any)
     })
     svg.call(zoom as any)
 
-    const linkGen = d3.linkHorizontal().x((d: any) => d.y).y((d: any) => d.x)
-    const linkGrp = g.append('g')
-      .attr('fill', 'none')
-      .attr('stroke', '#AA2B1D')
-      .attr('stroke-opacity', 0.7)
-      .attr('stroke-width', 2.5)
-    linkGrp.selectAll('path')
+    // ——— 1) أغصان العلاقات (منحنيات ناعمة فقط، لا خطوط مستقيمة) ———
+    const linkGrp = g.append('g').attr('fill', 'none')
+    linkGrp
+      .selectAll('path')
       .data(links)
       .join('path')
-      .attr('d', linkGen as any)
+      .attr('stroke', '#8a7356')
+      .attr('stroke-opacity', 0.85)
+      .attr('stroke-width', (l: any) => {
+        const depth = (l.target as any).depth ?? 0
+        return Math.max(1.2, STROKE_BRANCH - depth * 0.15)
+      })
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round')
+      .attr('d', (l: any) => {
+        const src = l.source as any
+        const tgt = l.target as any
+        const px = src.y
+        const py = src.x
+        const cx = tgt.y
+        const cy = tgt.x
+        return organicBranchPath(px, py, cx, cy, BRANCH_END_GAP, DROP)
+      })
       .each(function () {
-        d3.select(this).append('title').text('علاقة أبوية')
+        d3.select(this).append('title').text('علاقة نسب')
       })
 
-    const node = g
-      .append('g')
-      .selectAll('g')
-      .data(nodes)
-      .join('g')
-      .attr('transform', (d: any) => `translate(${d.y},${d.x})`)
-      .style('cursor', 'pointer')
+    // ——— 2) العُقد: زوج (يمين) + زوجة (يسار) + قوس زوجي ———
+    const nodeGrp = g.append('g').selectAll('g').data(nodes).join('g').style('cursor', 'pointer')
 
-    node
-      .append('rect')
-      .attr('width', NODE_WIDTH)
-      .attr('height', NODE_HEIGHT)
-      .attr('x', -NODE_WIDTH / 2)
-      .attr('y', -NODE_HEIGHT / 2)
-      .attr('rx', 10)
-      .attr('fill', (d: any) => (d.data.id === selectedId ? '#F3CF7A' : '#fafafa'))
-      .attr('stroke', (d: any) => (d.data.id === selectedId ? '#CC561E' : '#AA2B1D'))
-      .attr('stroke-width', (d: any) => (d.data.id === selectedId ? 3 : 2))
-
-    function lines(f: Family): string[] {
-      const out: string[] = []
-      if (f.title) out.push(f.title)
+    nodeGrp.each(function (d: any) {
+      const f = d.data.data as Family
+      const cx = d.y
+      const cy = d.x
       const husbands = f.members.filter((m) => m.role === 'husband').map((m) => m.person.fullName)
       const wives = f.members.filter((m) => m.role === 'wife').map((m) => m.person.fullName)
-      const children = f.members.filter((m) => m.role === 'child').map((m) => m.person.fullName)
-      if (husbands.length) out.push('زوج: ' + husbands.join('، '))
-      if (wives.length) out.push('زوجة: ' + wives.join('، '))
-      if (children.length) {
-        if (children.length <= 3) out.push('أطفال: ' + children.join('، '))
-        else out.push(`أطفال: ${children.length} (${children.slice(0, 2).join('، ')}...)`)
-      }
-      if (!out.length) out.push('أسرة')
-      return out
-    }
-
-    const lineHeight = 14
-    node.each(function (d: any) {
-      const f = d.data.data as Family
-      const texts = lines(f)
+      const husband = husbands[0] ?? ''
+      const wife = wives[0] ?? ''
       const gNode = d3.select(this)
-      texts.forEach((t, i) => {
-        const s = t.length > 28 ? t.slice(0, 26) + '…' : t
+
+      // قوس زواج: أفقي، مقعّر للأسفل، لا يلامس الأسماء
+      gNode
+        .append('path')
+        .attr('d', marriageArcPath(cx, cy, NAME_GAP, ARC_DEPTH, ARC_CLEAR))
+        .attr('fill', 'none')
+        .attr('stroke', (d: any) => (d.data.id === selectedId ? '#CC561E' : '#AA2B1D'))
+        .attr('stroke-width', STROKE_MARRIAGE)
+        .attr('stroke-opacity', 0.9)
+        .attr('stroke-linecap', 'round')
+        .each(function () {
+          d3.select(this).append('title').text('رابطة زواج / أسرة')
+        })
+
+      // الذكر يمين، الأنثى يسار — نفس المستوى الأفقي
+      const nameClip = (s: string, max: number) => (s.length > max ? s.slice(0, max - 1) + '…' : s)
+      const rightX = cx + NAME_GAP
+      const leftX = cx - NAME_GAP
+
+      if (husband) {
         gNode
           .append('text')
+          .attr('x', rightX)
+          .attr('y', cy)
+          .attr('text-anchor', 'start')
+          .attr('dominant-baseline', 'central')
+          .attr('font-size', FONT_NAME)
+          .attr('font-weight', '600')
+          .attr('fill', (d: any) => (d.data.id === selectedId ? '#1a1a1a' : '#2d2d2d'))
+          .text(nameClip(husband, 14))
+      }
+      if (wife) {
+        gNode
+          .append('text')
+          .attr('x', leftX)
+          .attr('y', cy)
+          .attr('text-anchor', 'end')
+          .attr('dominant-baseline', 'central')
+          .attr('font-size', FONT_NAME)
+          .attr('font-weight', '600')
+          .attr('fill', (d: any) => (d.data.id === selectedId ? '#1a1a1a' : '#2d2d2d'))
+          .text(nameClip(wife, 14))
+      }
+
+      // عنوان اختياري صغير تحت منتصف القوس
+      if (f.title && (husband || wife)) {
+        gNode
+          .append('text')
+          .attr('x', cx)
+          .attr('y', cy + ARC_DEPTH + 14)
           .attr('text-anchor', 'middle')
-          .attr('dy', -NODE_HEIGHT / 2 + 18 + i * lineHeight)
-          .attr('font-size', i === 0 ? 11 : 10)
-          .attr('font-weight', i === 0 ? 'bold' : 'normal')
-          .attr('fill', i === 0 ? '#18181b' : '#52525b')
-          .attr('x', 0)
-          .text(s)
-      })
+          .attr('font-size', FONT_TITLE)
+          .attr('fill', '#6b6b6b')
+          .text(nameClip(f.title, 12))
+      }
     })
 
-    node.append('title').text((d: any) => {
-      const f = d.data.data as Family
-      return lines(f).join('\n')
-    })
+    nodeGrp.on('click', (_: any, d: any) => setSelectedId(d.data.id))
 
-    node.on('click', (_: any, d: any) => {
-      setSelectedId(d.data.id)
+    // تلميح عند التمرير على العقدة: الزوج، الزوجة، أطفال
+    nodeGrp.each(function (d: any) {
+      const f = (d as any).data.data as Family
+      const parts: string[] = []
+      const h = f.members.filter((m) => m.role === 'husband').map((m) => m.person.fullName)
+      const w = f.members.filter((m) => m.role === 'wife').map((m) => m.person.fullName)
+      const c = f.members.filter((m) => m.role === 'child').map((m) => m.person.fullName)
+      if (h.length) parts.push('زوج: ' + h.join('، '))
+      if (w.length) parts.push('زوجة: ' + w.join('، '))
+      if (c.length) parts.push('أطفال: ' + c.join('، '))
+      if (parts.length) d3.select(this).append('title').text(parts.join('\n'))
     })
-    }).catch((e) => {
-      console.error('D3 load error:', e)
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [treeData, dim, selectedId])
-
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const ro = new ResizeObserver(() => {
-      const w = el.clientWidth || 800
-      const h = Math.max(400, el.clientHeight || 500)
-      setDim({ w: Math.max(400, w), h })
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
+  }, [treeData, selectedId])
 
   if (loading) {
     return (
@@ -236,8 +290,8 @@ export default function D3FamilyTree() {
 
   if (error) {
     return (
-      <div className="rounded-2xl glass-effect p-8 text-center border border-gray-200/50 dark:border-gray-800/50">
-        <p className="text-primary-600 dark:text-primary-400 font-medium">{error}</p>
+      <div className="rounded-2xl bg-white dark:bg-gray-800 p-8 text-center border border-gray-200 dark:border-gray-700">
+        <p className="text-primary-600 dark:text-primary-300 font-medium">{error}</p>
       </div>
     )
   }
@@ -245,10 +299,10 @@ export default function D3FamilyTree() {
   const families = treeData?.families ?? treeData?.households ?? []
   if (families.length === 0) {
     return (
-      <div className="rounded-2xl glass-effect p-8 sm:p-12 text-center border border-gray-200/50 dark:border-gray-800/50">
+      <div className="rounded-2xl bg-white dark:bg-gray-800 p-8 sm:p-12 text-center border border-gray-200 dark:border-gray-700">
         <div className="text-5xl mb-4">🌳</div>
-        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">لا توجد بيانات في الشجرة</p>
-        <p className="text-gray-600 dark:text-gray-400">ابدأ بإضافة أسر جديدة</p>
+        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">لا توجد بيانات في الشجرة</p>
+        <p className="text-gray-600 dark:text-gray-300">ابدأ بإضافة أسر جديدة</p>
       </div>
     )
   }
@@ -259,33 +313,33 @@ export default function D3FamilyTree() {
     <div className="space-y-4">
       <div
         ref={containerRef}
-        className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 shadow-soft"
-        style={{ minHeight: 'min(500px, 60vh)' }}
+        className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-[#faf8f5] dark:bg-gray-900 shadow-soft"
+        style={{ height: 'min(68vh, 720px)', minHeight: 520 }}
       >
-        <svg ref={svgRef} className="block w-full" style={{ minHeight: 400 }} />
+        <svg ref={svgRef} className="block w-full h-full" style={{ minHeight: 520 }} />
       </div>
       {selected && (
-        <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800">
+        <div className="rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-3">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
                 {selected.title || 'أسرة'} — العلاقات والأفراد
               </h3>
               <div className="space-y-2 text-sm">
                 {selected.members.filter((m) => m.role === 'husband').length > 0 && (
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-gray-800 dark:text-gray-200">
                     <span className="font-semibold text-primary-600">الزوج:</span>{' '}
                     {selected.members.filter((m) => m.role === 'husband').map((m) => m.person.fullName).join('، ')}
                   </p>
                 )}
                 {selected.members.filter((m) => m.role === 'wife').length > 0 && (
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-gray-800 dark:text-gray-200">
                     <span className="font-semibold text-primary-600">الزوجات:</span>{' '}
                     {selected.members.filter((m) => m.role === 'wife').map((m) => m.person.fullName).join('، ')}
                   </p>
                 )}
                 {selected.members.filter((m) => m.role === 'child').length > 0 && (
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-gray-800 dark:text-gray-200">
                     <span className="font-semibold text-primary-600">الأطفال:</span>{' '}
                     {selected.members.filter((m) => m.role === 'child').map((m) => m.person.fullName).join('، ')}
                   </p>
