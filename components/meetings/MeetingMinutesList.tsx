@@ -40,8 +40,8 @@ export default function MeetingMinutesList() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
-          <p className="text-slate-600 dark:text-slate-400 font-medium">جاري التحميل...</p>
+          <div className="w-16 h-16 border-4 border-olive-200 border-t-olive-600 rounded-full animate-spin mx-auto"></div>
+          <p className="text-olive-600 dark:text-olive-400 font-medium">جاري التحميل...</p>
         </div>
       </div>
     )
@@ -51,16 +51,16 @@ export default function MeetingMinutesList() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-olive-600 to-burgundy-500 bg-clip-text text-transparent mb-2">
             محاضر الاجتماعات
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">سجل اجتماعات العائلة</p>
+          <p className="text-olive-600 dark:text-olive-400">سجل اجتماعات العائلة</p>
         </div>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-slate-100 font-medium transition-all"
+          className="px-4 py-2.5 bg-white dark:bg-olive-900/50 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 text-olive-900 dark:text-olive-100 font-medium transition-all"
         >
           <option value="">جميع الحالات</option>
           <option value="draft">مسودة</option>
@@ -70,25 +70,25 @@ export default function MeetingMinutesList() {
       </div>
 
       {minutes.length === 0 ? (
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-12 text-center border border-slate-200/50 dark:border-slate-800/50">
-          <div className="text-6xl mb-4">📋</div>
-          <p className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">لا توجد محاضر</p>
-          <p className="text-slate-500 dark:text-slate-400">ابدأ بإنشاء محضر اجتماع جديد</p>
+        <div className="glass-effect rounded-2xl p-8 sm:p-12 text-center border border-olive-200/50 dark:border-olive-800/50">
+          <div className="text-5xl sm:text-6xl mb-4">📋</div>
+          <p className="text-lg sm:text-xl font-semibold text-olive-800 dark:text-olive-200 mb-2">لا توجد محاضر</p>
+          <p className="text-olive-600 dark:text-olive-400">ابدأ بإنشاء محضر اجتماع جديد</p>
         </div>
       ) : (
         <div className="space-y-4 lg:space-y-6">
           {minutes.map((minute, index) => (
             <div
               key={minute.id}
-              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50 hover:shadow-glow transition-all duration-300 animate-slide-up"
+              className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-olive-200/50 dark:border-olive-800/50 hover:shadow-glow transition-all duration-300 animate-slide-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                 <div className="flex-1">
-                  <h3 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                  <h3 className="text-xl lg:text-2xl font-bold text-olive-900 dark:text-olive-100 mb-2">
                     {minute.title}
                   </h3>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-olive-600 dark:text-olive-400">
                     <span className="flex items-center gap-1.5">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -112,7 +112,7 @@ export default function MeetingMinutesList() {
                     minute.status === 'published'
                       ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                       : minute.status === 'archived'
-                      ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
+                      ? 'bg-olive-100 text-olive-800 dark:bg-olive-800 dark:text-olive-300'
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
                   }`}
                 >
@@ -124,7 +124,7 @@ export default function MeetingMinutesList() {
                 </span>
               </div>
               <div className="prose prose-slate dark:prose-invert max-w-none">
-                <div className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                <div className="text-olive-700 dark:text-olive-300 whitespace-pre-wrap leading-relaxed">
                   {minute.content}
                 </div>
               </div>

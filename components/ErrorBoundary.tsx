@@ -51,10 +51,10 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex items-center justify-center min-h-screen p-4">
             <div className="text-center space-y-4 max-w-md">
               <div className="text-5xl">🔄</div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-bold text-olive-900 dark:text-olive-100">
                 جاري تحديث الصفحة...
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-olive-600 dark:text-olive-400">
                 يرجى الانتظار قليلاً بينما نقوم بإعادة تحميل الصفحة
               </p>
             </div>
@@ -66,15 +66,15 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="flex items-center justify-center min-h-screen p-4">
           <div className="text-center space-y-4 max-w-md">
             <div className="text-5xl">⚠️</div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            <h2 className="text-xl font-bold text-olive-900 dark:text-olive-100">
               حدث خطأ غير متوقع
             </h2>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-olive-600 dark:text-olive-400">
               {this.state.error?.message || 'حدث خطأ أثناء تحميل الصفحة'}
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg elegant-shadow hover:shadow-lg transition-all"
+              className="px-6 py-3 gradient-primary text-white font-semibold rounded-xl elegant-shadow hover:shadow-glow transition-all"
             >
               إعادة تحميل الصفحة
             </button>

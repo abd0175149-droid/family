@@ -10,8 +10,12 @@ type FormType = 'person' | 'household'
 export default function AddTreeItemPage() {
   const [formType, setFormType] = useState<FormType>('person')
 
-  const handleSuccess = () => {
-    window.location.replace('/tree')
+  const handleSuccess = (householdId?: string) => {
+    if (householdId) {
+      window.location.replace(`/tree/household/${householdId}/edit`)
+    } else {
+      window.location.replace('/tree')
+    }
   }
 
   const handleCancel = () => {
@@ -22,24 +26,24 @@ export default function AddTreeItemPage() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         {/* Tabs */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-2 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
-          <div className="flex gap-2">
+        <div className="glass-effect rounded-2xl p-2 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFormType('person')}
-              className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
+              className={`flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold transition-all ${
                 formType === 'person'
                   ? 'gradient-primary text-white shadow-glow'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
               }`}
             >
               ➕ إضافة شخص
             </button>
             <button
               onClick={() => setFormType('household')}
-              className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
+              className={`flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold transition-all ${
                 formType === 'household'
                   ? 'gradient-primary text-white shadow-glow'
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
               }`}
             >
               🏠 إنشاء أسرة
@@ -47,8 +51,7 @@ export default function AddTreeItemPage() {
           </div>
         </div>
 
-        {/* Form Card */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
+        <div className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
           {formType === 'person' ? (
             <AddPersonForm onSuccess={handleSuccess} onCancel={handleCancel} />
           ) : (

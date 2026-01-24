@@ -8,6 +8,27 @@ const updateHouseholdSchema = z.object({
   title: z.string().optional(),
 })
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  return withPermission(request, PERMISSIONS.TREE_READ, async () => {
+    try {
+      const household = await TreeService.getHousehold(params.id)
+      if (!household) {
+        return NextResponse.json({ error: 'الأسرة غير موجودة' }, { status: 404 })
+      }
+      return NextResponse.json(household)
+    } catch (e) {
+      console.error('Error fetching household:', e)
+      return NextResponse.json(
+        { error: 'حدث خطأ أثناء جلب الأسرة' },
+        { status: 500 }
+      )
+    }
+  })
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

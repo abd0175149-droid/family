@@ -254,6 +254,23 @@ export class TreeService {
     })
   }
 
+  static async getHousehold(id: string) {
+    return prisma.household.findUnique({
+      where: { id },
+      include: {
+        members: {
+          include: {
+            person: {
+              include: { photoFile: true },
+            },
+          },
+        },
+        childLinks: { include: { childHousehold: true, linkViaPerson: true } },
+        parentLinks: { include: { parentHousehold: true, linkViaPerson: true } },
+      },
+    })
+  }
+
   static async updateHousehold(id: string, data: Partial<CreateHouseholdData>) {
     return prisma.household.update({
       where: { id },

@@ -74,8 +74,8 @@ export default function ProfilePage() {
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
-            <p className="text-slate-600 dark:text-slate-400 font-medium">جاري التحميل...</p>
+            <div className="w-16 h-16 border-4 border-olive-200 border-t-olive-600 rounded-full animate-spin mx-auto"></div>
+            <p className="text-olive-600 dark:text-olive-400 font-medium">جاري التحميل...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -97,28 +97,28 @@ export default function ProfilePage() {
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-olive-600 to-burgundy-500 bg-clip-text text-transparent mb-2">
             الملف الشخصي
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">عرض وتعديل معلوماتك الشخصية</p>
+          <p className="text-olive-600 dark:text-olive-400">عرض وتعديل معلوماتك الشخصية</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-2 space-y-6">
             {/* User Info Card */}
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
-              <div className="flex items-start gap-6 mb-6">
-                <div className="w-24 h-24 rounded-2xl gradient-primary flex items-center justify-center text-white text-4xl font-bold shadow-glow">
+            <div className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 mb-6">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl gradient-primary flex items-center justify-center text-white text-3xl sm:text-4xl font-bold shadow-glow flex-shrink-0">
                   {user.fullName.charAt(0)}
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-olive-900 dark:text-olive-100 mb-2">
                     {user.fullName}
                   </h2>
-                  <p className="text-slate-600 dark:text-slate-400 mb-4">{user.email}</p>
+                  <p className="text-olive-600 dark:text-olive-400 mb-4 truncate">{user.email}</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-olive-100 text-olive-800 dark:bg-olive-900/30 dark:text-olive-400">
                       {getRoleLabel(user.role)}
                     </span>
                     <span
@@ -134,21 +134,21 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-olive-200/50 dark:border-olive-800/50">
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">البريد الإلكتروني</p>
-                  <p className="text-slate-900 dark:text-slate-100 font-medium">{user.email}</p>
+                  <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">البريد الإلكتروني</p>
+                  <p className="text-olive-900 dark:text-olive-100 font-medium">{user.email}</p>
                 </div>
                 {user.phone && (
                   <div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">رقم الهاتف</p>
-                    <p className="text-slate-900 dark:text-slate-100 font-medium">{user.phone}</p>
+                    <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">رقم الهاتف</p>
+                    <p className="text-olive-900 dark:text-olive-100 font-medium">{user.phone}</p>
                   </div>
                 )}
                 {user.lastLoginAt && (
                   <div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">آخر تسجيل دخول</p>
-                    <p className="text-slate-900 dark:text-slate-100 font-medium">
+                    <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">آخر تسجيل دخول</p>
+                    <p className="text-olive-900 dark:text-olive-100 font-medium">
                       {new Date(user.lastLoginAt).toLocaleDateString('ar-SA', {
                         year: 'numeric',
                         month: 'long',
@@ -160,8 +160,8 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">تاريخ التسجيل</p>
-                  <p className="text-slate-900 dark:text-slate-100 font-medium">
+                  <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">تاريخ التسجيل</p>
+                  <p className="text-olive-900 dark:text-olive-100 font-medium">
                     {new Date(user.createdAt).toLocaleDateString('ar-SA', {
                       year: 'numeric',
                       month: 'long',
@@ -174,26 +174,26 @@ export default function ProfilePage() {
 
             {/* Person Info Card */}
             {user.person && (
-              <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 lg:p-8 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+              <div className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+                <h3 className="text-xl font-bold text-olive-900 dark:text-olive-100 mb-6 flex items-center gap-2">
                   <span className="text-2xl">👤</span>
                   معلومات الشخص في الشجرة
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">الاسم الكامل</p>
-                    <p className="text-slate-900 dark:text-slate-100 font-medium">{user.person.fullName}</p>
+                    <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">الاسم الكامل</p>
+                    <p className="text-olive-900 dark:text-olive-100 font-medium">{user.person.fullName}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">الجنس</p>
-                    <p className="text-slate-900 dark:text-slate-100 font-medium">
+                    <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">الجنس</p>
+                    <p className="text-olive-900 dark:text-olive-100 font-medium">
                       {user.person.gender === 'male' ? 'ذكر' : 'أنثى'}
                     </p>
                   </div>
                   {user.person.birthDate && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">تاريخ الميلاد</p>
-                      <p className="text-slate-900 dark:text-slate-100 font-medium">
+                      <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">تاريخ الميلاد</p>
+                      <p className="text-olive-900 dark:text-olive-100 font-medium">
                         {new Date(user.person.birthDate).toLocaleDateString('ar-SA', {
                           year: 'numeric',
                           month: 'long',
@@ -204,8 +204,8 @@ export default function ProfilePage() {
                   )}
                   {user.person.deathDate && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">تاريخ الوفاة</p>
-                      <p className="text-slate-900 dark:text-slate-100 font-medium">
+                      <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">تاريخ الوفاة</p>
+                      <p className="text-olive-900 dark:text-olive-100 font-medium">
                         {new Date(user.person.deathDate).toLocaleDateString('ar-SA', {
                           year: 'numeric',
                           month: 'long',
@@ -216,13 +216,13 @@ export default function ProfilePage() {
                   )}
                   {user.person.notes && (
                     <div className="md:col-span-2">
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">ملاحظات</p>
-                      <p className="text-slate-900 dark:text-slate-100">{user.person.notes}</p>
+                      <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-1">ملاحظات</p>
+                      <p className="text-olive-900 dark:text-olive-100">{user.person.notes}</p>
                     </div>
                   )}
                   {user.person.photoFile && (
                     <div className="md:col-span-2">
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">الصورة الشخصية</p>
+                      <p className="text-sm font-medium text-olive-600 dark:text-olive-400 mb-2">الصورة الشخصية</p>
                       <img
                         src={`/api/files/${user.person.photoFile.id}`}
                         alt={user.person.fullName}
@@ -245,7 +245,7 @@ export default function ProfilePage() {
 
           {/* Quick Stats */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl p-6 text-white shadow-glow">
+            <div className="bg-gradient-to-br from-olive-500 to-burgundy-500 rounded-2xl p-4 sm:p-6 text-white shadow-glow">
               <h3 className="text-lg font-bold mb-4">إحصائيات سريعة</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -259,18 +259,18 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-soft border border-slate-200/50 dark:border-slate-800/50">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">إجراءات سريعة</h3>
+            <div className="glass-effect rounded-2xl p-4 sm:p-6 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+              <h3 className="text-lg font-bold text-olive-900 dark:text-olive-100 mb-4">إجراءات سريعة</h3>
               <div className="space-y-2">
                 <button
                   onClick={() => router.push('/my-finance')}
-                  className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-right"
+                  className="w-full px-4 py-2.5 bg-olive-100 dark:bg-olive-800/50 text-olive-800 dark:text-olive-200 font-medium rounded-lg hover:bg-olive-200 dark:hover:bg-olive-800 transition-colors text-right"
                 >
                   💳 عرض دفعاتي
                 </button>
                 <button
                   onClick={() => router.push('/tree')}
-                  className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-right"
+                  className="w-full px-4 py-2.5 bg-olive-100 dark:bg-olive-800/50 text-olive-800 dark:text-olive-200 font-medium rounded-lg hover:bg-olive-200 dark:hover:bg-olive-800 transition-colors text-right"
                 >
                   🌳 عرض الشجرة
                 </button>

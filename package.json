@@ -22,6 +22,7 @@
     "autoprefixer": "^10.4.19",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
+    "d3": "^7.8.5",
     "dagre": "^0.8.5",
     "date-fns": "^3.6.0",
     "jsonwebtoken": "^9.0.2",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "@types/bcryptjs": "^2.4.6",
+    "@types/d3": "^7.4.3",
     "@types/dagre": "^0.7.53",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.0",

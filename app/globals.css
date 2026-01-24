@@ -3,23 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --background: #fafafa;
-  --foreground: #1a1a1a;
+  --background: #fdfcf8;
+  --foreground: #1d1c0e;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --border: #e5e7eb;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
+  --card-foreground: #1d1c0e;
+  --border: #e8e6d0;
+  --muted: #f5f4e8;
+  --muted-foreground: #535022;
+  --olive: #8A8635;
+  --burgundy: #AA2B1D;
+  --orange: #CC561E;
+  --gold: #F3CF7A;
 }
 
-[data-theme='dark'] {
-  --background: #0a0a0f;
-  --foreground: #f5f5f5;
-  --card: #14141a;
-  --card-foreground: #f5f5f5;
-  --border: #1f1f2e;
-  --muted: #1a1a24;
-  --muted-foreground: #9ca3af;
+[data-theme='dark'],
+.dark {
+  --background: #0f0f07;
+  --foreground: #f5f4e8;
+  --card: #1d1c0e;
+  --card-foreground: #f5f4e8;
+  --border: #38361a;
+  --muted: #1d1c0e;
+  --muted-foreground: #b9b47a;
 }
 
 * {
@@ -45,7 +50,7 @@ body {
   }
 
   .gradient-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-700;
+    @apply bg-gradient-to-r from-olive-500 to-gold-400;
   }
 
   /* تصميم أنيق بدون gradients مبالغ بها */
@@ -62,15 +67,16 @@ body {
   }
   
   .glass-effect {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(253, 252, 248, 0.85);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(138, 134, 53, 0.15);
   }
   
-  .dark .glass-effect {
-    background: rgba(20, 20, 26, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  .dark .glass-effect,
+  .glass-effect.dark {
+    background: rgba(29, 28, 14, 0.9);
+    border: 1px solid rgba(243, 207, 122, 0.15);
   }
 }
 

@@ -106,11 +106,11 @@ function OrganicSVG({ result }: { result: LayoutResult }) {
             key={p.id}
             d={p.d}
             strokeWidth={p.strokeWidth}
-            className="text-slate-600 dark:text-slate-400"
+            className="text-olive-600 dark:text-olive-400"
           />
         ))}
       </g>
-      <g className="fill-slate-900 dark:fill-slate-100" style={{ fontFamily: 'var(--font-arabic), system-ui' }}>
+      <g className="fill-olive-900 dark:fill-olive-100" style={{ fontFamily: 'var(--font-arabic), system-ui' }}>
         {labels.map((l) => (
           <text
             key={l.id}
@@ -155,10 +155,10 @@ export default function OrganicTree() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
+      <div className="flex items-center justify-center min-h-[500px] sm:min-h-[600px]">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-2 border-slate-300 dark:border-slate-600 border-t-slate-900 dark:border-t-slate-100 rounded-full animate-spin mx-auto" />
-          <p className="text-slate-600 dark:text-slate-400 font-medium">جاري تحميل الشجرة...</p>
+          <div className="w-12 h-12 border-2 border-olive-200 dark:border-olive-700 border-t-olive-600 dark:border-t-olive-400 rounded-full animate-spin mx-auto" />
+          <p className="text-olive-600 dark:text-olive-400 font-medium">جاري تحميل الشجرة...</p>
         </div>
       </div>
     )
@@ -167,26 +167,26 @@ export default function OrganicTree() {
   const families = treeData?.families ?? treeData?.households ?? []
   if (!treeData || families.length === 0) {
     return (
-      <div className="elegant-border rounded-lg bg-white dark:bg-slate-900 p-12 text-center elegant-shadow">
+      <div className="rounded-2xl glass-effect p-8 sm:p-12 text-center border border-olive-200/50 dark:border-olive-800/50 shadow-soft">
         <div className="text-5xl mb-4">🌳</div>
-        <p className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">لا توجد بيانات في الشجرة</p>
-        <p className="text-slate-500 dark:text-slate-400">ابدأ بإضافة أسر جديدة</p>
+        <p className="text-lg font-semibold text-olive-800 dark:text-olive-200 mb-2">لا توجد بيانات في الشجرة</p>
+        <p className="text-olive-600 dark:text-olive-400">ابدأ بإضافة أسر جديدة</p>
       </div>
     )
   }
 
   if (!layoutResult) {
     return (
-      <div className="elegant-border rounded-lg bg-white dark:bg-slate-900 p-12 text-center elegant-shadow">
-        <p className="text-slate-600 dark:text-slate-400">لا يمكن بناء الشجرة من البيانات الحالية.</p>
+      <div className="rounded-2xl glass-effect p-8 sm:p-12 text-center border border-olive-200/50 dark:border-olive-800/50 shadow-soft">
+        <p className="text-olive-600 dark:text-olive-400">لا يمكن بناء الشجرة من البيانات الحالية.</p>
       </div>
     )
   }
 
   return (
     <div
-      className="w-full overflow-auto rounded-xl elegant-border bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 elegant-shadow"
-      style={{ minHeight: '900px' }}
+      className="w-full overflow-auto rounded-xl border border-olive-200/50 dark:border-olive-800/50 bg-gradient-to-br from-olive-50 to-gold-50/50 dark:from-olive-950 dark:to-olive-900 shadow-soft"
+      style={{ minHeight: 'min(900px, 70vh)' }}
     >
       <OrganicSVG result={layoutResult} />
     </div>

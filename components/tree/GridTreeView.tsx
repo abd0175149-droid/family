@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 interface Household {
   id: string
@@ -48,8 +49,8 @@ export default function GridTreeView() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
-          <p className="text-slate-600 dark:text-slate-400 font-medium">جاري تحميل الشجرة...</p>
+          <div className="w-16 h-16 border-4 border-olive-200 border-t-olive-600 rounded-full animate-spin mx-auto"></div>
+          <p className="text-olive-600 dark:text-olive-400 font-medium">جاري تحميل الشجرة...</p>
         </div>
       </div>
     )
@@ -57,10 +58,10 @@ export default function GridTreeView() {
 
   if (!treeData || treeData.households.length === 0) {
     return (
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-12 text-center border border-slate-200/50 dark:border-slate-800/50">
-        <div className="text-6xl mb-4">🌳</div>
-        <p className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">لا توجد بيانات في الشجرة</p>
-        <p className="text-slate-500 dark:text-slate-400">ابدأ بإضافة أسر جديدة</p>
+      <div className="glass-effect rounded-2xl p-8 sm:p-12 text-center border border-olive-200/50 dark:border-olive-800/50">
+        <div className="text-5xl sm:text-6xl mb-4">🌳</div>
+        <p className="text-lg sm:text-xl font-semibold text-olive-800 dark:text-olive-200 mb-2">لا توجد بيانات في الشجرة</p>
+        <p className="text-olive-600 dark:text-olive-400">ابدأ بإضافة أسر جديدة</p>
       </div>
     )
   }
@@ -81,34 +82,44 @@ function HouseholdNode({ household, index }: { household: Household; index: numb
 
   return (
     <div
-      className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-soft border border-slate-200/50 dark:border-slate-800/50 hover:shadow-glow transition-all duration-300 hover:scale-[1.02] animate-slide-up"
+      className="glass-effect rounded-2xl p-4 sm:p-6 shadow-soft border border-olive-200/50 dark:border-olive-800/50 hover:shadow-glow transition-all duration-300 hover:scale-[1.02] animate-slide-up"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      {household.title && (
-        <div className="mb-4 pb-3 border-b border-slate-200/50 dark:border-slate-800/50">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <span className="text-xl">🏠</span>
-            {household.title}
-          </h3>
+      <div className="flex items-start justify-between gap-2 mb-4 pb-3 border-b border-olive-200/50 dark:border-olive-800/50">
+        <div className="flex items-center gap-2 min-w-0">
+          {household.title && (
+            <>
+              <span className="text-xl">🏠</span>
+              <h3 className="text-lg font-bold text-olive-900 dark:text-olive-100 truncate">
+                {household.title}
+              </h3>
+            </>
+          )}
         </div>
-      )}
+        <Link
+          href={`/tree/household/${household.id}/edit`}
+          className="flex-shrink-0 px-2.5 py-1.5 text-xs font-medium text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50 rounded-lg transition-colors"
+        >
+          ✏️ تعديل
+        </Link>
+      </div>
 
       <div className="space-y-4">
         {husbands.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-olive-600 dark:text-olive-400 mb-2 uppercase tracking-wide">
               الزوج
             </p>
             <div className="space-y-1.5">
               {husbands.map((h) => (
                 <div
                   key={h.id}
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 bg-olive-50 dark:bg-olive-900/30 rounded-lg"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white font-semibold text-sm">
                     {h.person.fullName.charAt(0)}
                   </div>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">{h.person.fullName}</span>
+                  <span className="font-medium text-olive-900 dark:text-olive-100">{h.person.fullName}</span>
                 </div>
               ))}
             </div>
@@ -117,19 +128,19 @@ function HouseholdNode({ household, index }: { household: Household; index: numb
 
         {wives.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-olive-600 dark:text-olive-400 mb-2 uppercase tracking-wide">
               الزوجات
             </p>
             <div className="space-y-1.5">
               {wives.map((w) => (
                 <div
                   key={w.id}
-                  className="flex items-center gap-2 px-3 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 bg-burgundy-50 dark:bg-burgundy-900/20 rounded-lg"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-burgundy-400 to-burgundy-600 flex items-center justify-center text-white font-semibold text-sm">
                     {w.person.fullName.charAt(0)}
                   </div>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">{w.person.fullName}</span>
+                  <span className="font-medium text-olive-900 dark:text-olive-100">{w.person.fullName}</span>
                 </div>
               ))}
             </div>
@@ -138,12 +149,12 @@ function HouseholdNode({ household, index }: { household: Household; index: numb
 
         {children.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-olive-600 dark:text-olive-400 mb-2 uppercase tracking-wide">
               الأطفال
             </p>
-            <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gold-100/80 dark:bg-gold-900/20 rounded-lg">
               <span className="text-2xl">👶</span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">
+              <span className="font-semibold text-olive-900 dark:text-olive-100">
                 {children.length} {children.length === 1 ? 'طفل' : 'أطفال'}
               </span>
             </div>
