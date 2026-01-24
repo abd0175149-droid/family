@@ -64,22 +64,34 @@ function buildHierarchy(families: Family[]): TreeNode[] {
 // • الزوج يمين، الزوجة يسار، نفس المستوى الأفقي؛ قوس أفقي مقعّر للأسفل (رابطة زواج)، لا يلامس الأسماء.
 // • الخروج إلى الأبناء من منتصف القوس؛ منحنى نازل ثم تفرع سلس؛ غصن ينحني قليلاً للأعلى، ينتهي قبل الاسم.
 // • كل جيل أدنى = خطوط أنحف. التوازن وتجنب التقاطع عبر d3.tree.
-const NAME_GAP = 52           // نصف المسافة بين الزوج والزوجة (الذكر يمين، الأنثى يسار)
+// • كل اسم داخل تشبّس (chip) بحيز ثابت — منع تداخل الأسماء.
+const NAME_GAP = 58           // نصف المسافة بين مركزي التشبّسين (ذكر يمين، أنثى يسار)
 const ARC_DEPTH = 14          // عمق القوس الزوجي (مقعّر للأسفل)
-const ARC_CLEAR = 8           // بداية/نهاية القوس لا تلامس الأسماء
-const BRANCH_END_GAP = 22     // نهاية الغصن قبل الاسم (مسافة بيضاء)
+const ARC_CLEAR = 8           // بداية/نهاية القوس لا تلامس التشبّسات
+const BRANCH_END_GAP = 24     // نهاية الغصن قبل التشبّس (مسافة بيضاء)
 const DROP = 70               // هبوط المنحنى قبل التفرع
 const STROKE_MARRIAGE = 2.2   // سماكة القوس الزوجي
 const STROKE_BRANCH = 2       // سماكة الأغصان (أخف مع العمق)
-const FONT_NAME = 12
+const FONT_NAME = 11
 const FONT_TITLE = 10
+const CHIP_WIDTH = 74         // عرض ثابت لكل تشبّس — حيز محدد
+const CHIP_HEIGHT = 22        // ارتفاع التشبّس
+const CHIP_RX = 10            // تقويس زوايا التشبّس
+const CHIP_PAD = 6            // padding أفقي داخل التشبّس
+const MAX_CHIP_CHARS = 9      // أقصى حروف قبل القص بـ …
 
-/** قوس زوجي أفقي مقعّر للأسفل — من اليمين (ذكر) إلى اليسار (أنثى). لا يلامس الأسماء. */
+/** قوس زوجي أفقي مقعّر للأسفل — من اليمين (ذكر) إلى اليسار (أنثى). لا يلامس التشبّسات. */
 function marriageArcPath(cx: number, cy: number, halfGap: number, arcDepth: number, clear: number): string {
   const right = cx + halfGap - clear
   const left = cx - halfGap + clear
   const cpY = cy + arcDepth
   return `M ${right} ${cy} Q ${cx} ${cpY} ${left} ${cy}`
+}
+
+/** قص النص ووضع … عند تجاوز الطول. */
+function clipForChip(s: string, max: number): string {
+  if (!s) return ''
+  return s.length > max ? s.slice(0, max - 1) + '…' : s
 }
 
 /** منحنى غصن عضوي: من منتصف القوس نزولاً ثم تفرع سلس، ينحني قليلاً للأعلى عند النهاية. لا خطوط مستقيمة. */
@@ -134,9 +146,12 @@ export default function D3FamilyTree() {
       children: roots,
     }
 
-    const treeW = 880
-    const treeH = 560
-    const treeLayout = d3.tree<TreeNode>().size([treeW, treeH])
+    const treeW = 920
+    const treeH = 600
+    const treeLayout = d3
+      .tree<TreeNode>()
+      .size([treeW, treeH])
+      .separation((a: any, b: any) => (a.parent === b.parent ? 1.15 : 1.05))
     const hierarchy = d3.hierarchy(virtualRoot, (d) => d.children)
     treeLayout(hierarchy as any)
 
@@ -218,46 +233,87 @@ export default function D3FamilyTree() {
           d3.select(this).append('title').text('رابطة زواج / أسرة')
         })
 
-      // الذكر يمين، الأنثى يسار — نفس المستوى الأفقي
-      const nameClip = (s: string, max: number) => (s.length > max ? s.slice(0, max - 1) + '…' : s)
-      const rightX = cx + NAME_GAP
-      const leftX = cx - NAME_GAP
+      // تشبّسات بأحجام ثابتة — حماية من التداخل. الذكر يمين، الأنثى يسار.
+      const sel = (d: any) => d.data.id === selectedId
+      const chipFill = (d: any) => (sel(d) ? '#fef3e2' : '#f5f0eb')
+      const chipStroke = (d: any) => (sel(d) ? '#CC561E' : '#AA2B1D')
+      const chipStrokeOpacity = (d: any) => (sel(d) ? 1 : 0.6)
+      const textFill = (d: any) => (sel(d) ? '#1a1a1a' : '#2d2d2d')
 
       if (husband) {
-        gNode
+        const chip = gNode.append('g').attr('class', 'name-chip').attr('data-role', 'husband')
+        chip
+          .append('rect')
+          .attr('x', cx + NAME_GAP)
+          .attr('y', cy - CHIP_HEIGHT / 2)
+          .attr('width', CHIP_WIDTH)
+          .attr('height', CHIP_HEIGHT)
+          .attr('rx', CHIP_RX)
+          .attr('fill', chipFill as any)
+          .attr('stroke', chipStroke as any)
+          .attr('stroke-width', 1.2)
+          .attr('stroke-opacity', chipStrokeOpacity as any)
+        chip
           .append('text')
-          .attr('x', rightX)
+          .attr('x', cx + NAME_GAP + CHIP_PAD)
           .attr('y', cy)
           .attr('text-anchor', 'start')
           .attr('dominant-baseline', 'central')
           .attr('font-size', FONT_NAME)
           .attr('font-weight', '600')
-          .attr('fill', (d: any) => (d.data.id === selectedId ? '#1a1a1a' : '#2d2d2d'))
-          .text(nameClip(husband, 14))
+          .attr('fill', textFill as any)
+          .text(clipForChip(husband, MAX_CHIP_CHARS))
       }
       if (wife) {
-        gNode
+        const chip = gNode.append('g').attr('class', 'name-chip').attr('data-role', 'wife')
+        chip
+          .append('rect')
+          .attr('x', cx - NAME_GAP - CHIP_WIDTH)
+          .attr('y', cy - CHIP_HEIGHT / 2)
+          .attr('width', CHIP_WIDTH)
+          .attr('height', CHIP_HEIGHT)
+          .attr('rx', CHIP_RX)
+          .attr('fill', chipFill as any)
+          .attr('stroke', chipStroke as any)
+          .attr('stroke-width', 1.2)
+          .attr('stroke-opacity', chipStrokeOpacity as any)
+        chip
           .append('text')
-          .attr('x', leftX)
+          .attr('x', cx - NAME_GAP - CHIP_WIDTH + CHIP_WIDTH - CHIP_PAD)
           .attr('y', cy)
           .attr('text-anchor', 'end')
           .attr('dominant-baseline', 'central')
           .attr('font-size', FONT_NAME)
           .attr('font-weight', '600')
-          .attr('fill', (d: any) => (d.data.id === selectedId ? '#1a1a1a' : '#2d2d2d'))
-          .text(nameClip(wife, 14))
+          .attr('fill', textFill as any)
+          .text(clipForChip(wife, MAX_CHIP_CHARS))
       }
 
-      // عنوان اختياري صغير تحت منتصف القوس
+      // عنوان اختياري صغير تحت منتصف القوس (تشبّس صغير أيضاً)
       if (f.title && (husband || wife)) {
-        gNode
+        const t = clipForChip(f.title, 10)
+        const tw = Math.min(t.length * 6.5, 56)
+        const th = 16
+        const titleChip = gNode.append('g').attr('class', 'title-chip')
+        titleChip
+          .append('rect')
+          .attr('x', cx - tw / 2)
+          .attr('y', cy + ARC_DEPTH + 6)
+          .attr('width', tw)
+          .attr('height', th)
+          .attr('rx', 6)
+          .attr('fill', 'rgba(0,0,0,0.04)')
+          .attr('stroke', 'rgba(0,0,0,0.08)')
+          .attr('stroke-width', 1)
+        titleChip
           .append('text')
           .attr('x', cx)
-          .attr('y', cy + ARC_DEPTH + 14)
+          .attr('y', cy + ARC_DEPTH + 6 + th / 2)
           .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'central')
           .attr('font-size', FONT_TITLE)
           .attr('fill', '#6b6b6b')
-          .text(nameClip(f.title, 12))
+          .text(t)
       }
     })
 
