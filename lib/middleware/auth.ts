@@ -77,5 +77,11 @@ export function setAuthCookie(response: NextResponse, token: string) {
 }
 
 export function clearAuthCookie(response: NextResponse) {
-  response.cookies.delete('auth-token')
+  response.cookies.set('auth-token', '', {
+    maxAge: 0,
+    path: '/',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  })
 }

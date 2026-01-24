@@ -341,22 +341,22 @@ export class TreeService {
   }
 
   static async searchPersons(query: string) {
-    // MySQL doesn't support case-insensitive mode in Prisma
-    // Using contains which works case-insensitively in MySQL by default
+    const trimmed = (query || '').trim()
+    const take = 500
+    const include = {
+      photoFile: true,
+      householdMembers: { include: { household: true } },
+    }
+    if (!trimmed) {
+      return prisma.person.findMany({
+        orderBy: { fullName: 'asc' },
+        include,
+        take,
+      })
+    }
     return prisma.person.findMany({
-      where: {
-        fullName: {
-          contains: query,
-        },
-      },
-      include: {
-        photoFile: true,
-        householdMembers: {
-          include: {
-            household: true,
-          },
-        },
-      },
+      where: { fullName: { contains: trimmed } },
+      include,
       take: 50,
     })
   }

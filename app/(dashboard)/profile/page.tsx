@@ -37,7 +37,7 @@ export default function ProfilePage() {
     fetch('/api/auth/me', { credentials: 'include' })
       .then((res) => {
         if (!res.ok) {
-          router.push('/login')
+          window.location.href = '/login'
           return null
         }
         return res.json()

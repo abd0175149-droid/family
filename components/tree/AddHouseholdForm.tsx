@@ -19,6 +19,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
   const [error, setError] = useState('')
   const [persons, setPersons] = useState<Person[]>([])
   const [loadingPersons, setLoadingPersons] = useState(true)
+  const [personsLoadError, setPersonsLoadError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     members: [] as Array<{
@@ -28,17 +29,35 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
     }>,
   })
 
-  useEffect(() => {
-    // جلب قائمة الأشخاص
-    fetch('/api/tree/search?q=')
-      .then((res) => res.json())
+  const loadPersons = () => {
+    setPersonsLoadError(null)
+    setLoadingPersons(true)
+    fetch('/api/tree/search?q=', { credentials: 'include' })
+      .then((res) => {
+        if (!res.ok) {
+          setLoadingPersons(false)
+          setPersonsLoadError('تعذر تحميل قائمة الأشخاص. تحقق من تسجيل الدخول وجرب مرة أخرى.')
+          return null
+        }
+        return res.json()
+      })
       .then((data) => {
-        setPersons(data)
         setLoadingPersons(false)
+        if (data != null && Array.isArray(data)) {
+          setPersons(data)
+          setPersonsLoadError(null)
+        } else {
+          setPersonsLoadError('تعذر تحميل قائمة الأشخاص. تحقق من تسجيل الدخول وجرب مرة أخرى.')
+        }
       })
       .catch(() => {
         setLoadingPersons(false)
+        setPersonsLoadError('تعذر تحميل قائمة الأشخاص. تحقق من تسجيل الدخول وجرب مرة أخرى.')
       })
+  }
+
+  useEffect(() => {
+    loadPersons()
   }, [])
 
   const addMember = () => {
@@ -168,6 +187,17 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
 
         {loadingPersons ? (
           <div className="text-center py-8 text-slate-500">جاري تحميل الأشخاص...</div>
+        ) : personsLoadError ? (
+          <div className="text-center py-8 px-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+            <p className="text-amber-700 dark:text-amber-400 font-medium mb-4">{personsLoadError}</p>
+            <button
+              type="button"
+              onClick={loadPersons}
+              className="px-4 py-2 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-medium rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
         ) : (
           <div className="space-y-4">
             {formData.members.map((member, index) => (
@@ -238,7 +268,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
             ))}
             {formData.members.length === 0 && (
               <div className="text-center py-8 text-slate-500 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
-                اضغط على "إضافة عضو" لإضافة أعضاء للأسرة
+                {'اضغط على \'إضافة عضو\' لإضافة أعضاء للأسرة'}
               </div>
             )}
           </div>

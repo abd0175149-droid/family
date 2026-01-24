@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && NODE_ENV=production next build",
-    "start": "NODE_ENV=production next start",
-    "start:server": "NODE_ENV=production node server.js",
+    "build": "prisma generate && cross-env NODE_ENV=production next build",
+    "start": "cross-env NODE_ENV=production next start",
+    "start:server": "cross-env NODE_ENV=production node server.js",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -36,6 +36,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/dagre": "^0.7.53",
     "@types/jsonwebtoken": "^9.0.6",

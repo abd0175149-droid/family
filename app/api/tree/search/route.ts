@@ -7,12 +7,8 @@ export async function GET(request: NextRequest) {
   return withPermission(request, PERMISSIONS.TREE_READ, async () => {
     try {
       const { searchParams } = new URL(request.url)
-      const query = searchParams.get('q') || ''
+      const query = (searchParams.get('q') || '').trim()
       
-      if (!query) {
-        return NextResponse.json([])
-      }
-
       const results = await TreeService.searchPersons(query)
       return NextResponse.json(results)
     } catch (error) {

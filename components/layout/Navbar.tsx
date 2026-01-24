@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 interface NavbarProps {
   onMobileMenuToggle?: () => void
@@ -11,10 +10,8 @@ interface NavbarProps {
 export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
   const [user, setUser] = useState<any>(null)
   const [isDark, setIsDark] = useState(false)
-  const router = useRouter()
 
   useEffect(() => {
-    // Check for user session
     fetch('/api/auth/me', { credentials: 'include' })
       .then((res) => res.json())
       .then((data) => {
@@ -42,8 +39,8 @@ export default function Navbar({ onMobileMenuToggle }: NavbarProps) {
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-    router.push('/login')
-    router.refresh()
+    // توجيه كامل الصفحة لتفريغ الحالة وتحميل نسخة جديدة (يتجنب كاش Hostinger)
+    window.location.href = '/login'
   }
 
   return (

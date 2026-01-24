@@ -2,18 +2,17 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
   const response = NextResponse.next()
 
-  // إضافة headers لمنع الكاش للصفحات الديناميكية
-  if (request.nextUrl.pathname.startsWith('/api')) {
+  if (path.startsWith('/api')) {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
     response.headers.set('Pragma', 'no-cache')
     response.headers.set('Expires', '0')
-  }
-
-  // إضافة version header للملفات الثابتة
-  if (request.nextUrl.pathname.startsWith('/_next/static')) {
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+  } else {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
   }
 
   return response

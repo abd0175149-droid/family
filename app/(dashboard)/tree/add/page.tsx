@@ -4,21 +4,18 @@ import { useState } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import AddPersonForm from '@/components/tree/AddPersonForm'
 import AddHouseholdForm from '@/components/tree/AddHouseholdForm'
-import { useRouter } from 'next/navigation'
 
 type FormType = 'person' | 'household'
 
 export default function AddTreeItemPage() {
-  const router = useRouter()
   const [formType, setFormType] = useState<FormType>('person')
 
   const handleSuccess = () => {
-    router.push('/tree')
-    router.refresh()
+    window.location.replace('/tree')
   }
 
   const handleCancel = () => {
-    router.push('/tree')
+    window.location.replace('/tree')
   }
 
   return (

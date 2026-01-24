@@ -43,7 +43,11 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-  
+
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-700;
+  }
+
   /* تصميم أنيق بدون gradients مبالغ بها */
   .elegant-border {
     border: 1px solid var(--border);

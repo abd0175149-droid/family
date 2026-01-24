@@ -23,9 +23,31 @@ export default function RootLayout({
             __html: `
 (function() {
   var key = 'chunk_reload_cnt';
+  var versionKey = 'app_version';
   if (typeof window !== 'undefined' && window.location.search.indexOf('_nc=') >= 0) {
     try { sessionStorage.removeItem(key); } catch (_) {}
   }
+  (function checkVersion() {
+    try {
+      var stored = localStorage.getItem(versionKey);
+      fetch('/api/version', { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(d) {
+        var v = d && d.version;
+        if (!v) return;
+        if (stored !== null && stored !== v) {
+          localStorage.setItem(versionKey, v);
+          fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(function(){}).then(function() {
+            var u = new URL(window.location.href);
+            u.searchParams.set('_v', Date.now());
+            window.location.replace(u.toString());
+          });
+          return;
+        }
+        if (stored === null) {
+          localStorage.setItem(versionKey, v);
+        }
+      }).catch(function() {});
+    } catch (_) {}
+  })();
   function isChunkError(e) {
     if (!e) return false;
     var msg = (e.message || (e.reason && e.reason.message) || '') + '';

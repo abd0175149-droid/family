@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import FamilyTreeViewVertical from './FamilyTreeViewVertical'
+import OrganicTree from './organic/OrganicTree'
 import GridTreeView from './GridTreeView'
 
 type ViewMode = 'tree' | 'grid'
@@ -43,7 +43,7 @@ export default function TreeView() {
         </div>
       </div>
 
-      {viewMode === 'tree' ? <FamilyTreeViewVertical /> : <GridTreeView />}
+      {viewMode === 'tree' ? <OrganicTree /> : <GridTreeView />}
     </div>
   )
 }
