@@ -51,10 +51,10 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex items-center justify-center min-h-screen p-4">
             <div className="text-center space-y-4 max-w-md">
               <div className="text-5xl">🔄</div>
-              <h2 className="text-xl font-bold text-olive-900 dark:text-olive-100">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 جاري تحديث الصفحة...
               </h2>
-              <p className="text-olive-600 dark:text-olive-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 يرجى الانتظار قليلاً بينما نقوم بإعادة تحميل الصفحة
               </p>
             </div>
@@ -66,10 +66,10 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="flex items-center justify-center min-h-screen p-4">
           <div className="text-center space-y-4 max-w-md">
             <div className="text-5xl">⚠️</div>
-            <h2 className="text-xl font-bold text-olive-900 dark:text-olive-100">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               حدث خطأ غير متوقع
             </h2>
-            <p className="text-olive-600 dark:text-olive-400">
+            <p className="text-gray-600 dark:text-gray-400">
               {this.state.error?.message || 'حدث خطأ أثناء تحميل الصفحة'}
             </p>
             <button

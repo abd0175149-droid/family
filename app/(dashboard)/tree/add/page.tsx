@@ -26,14 +26,14 @@ export default function AddTreeItemPage() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
         {/* Tabs */}
-        <div className="glass-effect rounded-2xl p-2 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+        <div className="glass-effect rounded-2xl p-2 shadow-soft border border-gray-200 dark:border-gray-800">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFormType('person')}
               className={`flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold transition-all ${
                 formType === 'person'
                   ? 'gradient-primary text-white shadow-glow'
-                  : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
               }`}
             >
               ➕ إضافة شخص
@@ -43,7 +43,7 @@ export default function AddTreeItemPage() {
               className={`flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold transition-all ${
                 formType === 'household'
                   ? 'gradient-primary text-white shadow-glow'
-                  : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
               }`}
             >
               🏠 إنشاء أسرة
@@ -51,7 +51,7 @@ export default function AddTreeItemPage() {
           </div>
         </div>
 
-        <div className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-olive-200/50 dark:border-olive-800/50">
+        <div className="glass-effect rounded-2xl p-4 sm:p-6 lg:p-8 shadow-soft border border-gray-200 dark:border-gray-800">
           {formType === 'person' ? (
             <AddPersonForm onSuccess={handleSuccess} onCancel={handleCancel} />
           ) : (

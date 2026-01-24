@@ -59,8 +59,8 @@ export default function FinanceDashboard() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-olive-200 border-t-olive-600 rounded-full animate-spin mx-auto"></div>
-          <p className="text-olive-600 dark:text-olive-400 font-medium">جاري التحميل...</p>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">جاري التحميل...</p>
         </div>
       </div>
     )
@@ -110,7 +110,7 @@ export default function FinanceDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-olive-600 to-burgundy-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
             لوحة المالية
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">إدارة وإحصائيات الصندوق العائلي</p>
@@ -121,7 +121,7 @@ export default function FinanceDashboard() {
           <select
             value={year}
             onChange={(e) => setYear(parseInt(e.target.value))}
-            className="px-4 py-2.5 bg-white dark:bg-olive-900/50 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 text-olive-900 dark:text-olive-100 font-medium transition-all"
+            className="px-4 py-2.5 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-gray-100 font-medium transition-all"
           >
             {Array.from({ length: 5 }, (_, i) => year - 2 + i).map((y) => (
               <option key={y} value={y}>{y}</option>
@@ -130,7 +130,7 @@ export default function FinanceDashboard() {
           <select
             value={month}
             onChange={(e) => setMonth(parseInt(e.target.value))}
-            className="px-4 py-2.5 bg-white dark:bg-olive-900/50 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 text-olive-900 dark:text-olive-100 font-medium transition-all"
+            className="px-4 py-2.5 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-gray-100 font-medium transition-all"
           >
             {monthNames.map((name, index) => (
               <option key={index + 1} value={index + 1}>{name}</option>
@@ -181,7 +181,7 @@ export default function FinanceDashboard() {
               {data.overall.totalOut.toLocaleString()} <span className="text-lg text-slate-500">ر.س</span>
             </p>
           </div>
-          <div className="bg-gradient-to-br from-olive-500 to-burgundy-500 rounded-xl p-4 sm:p-5 text-white shadow-glow">
+          <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-4 sm:p-5 text-white shadow-glow">
             <p className="text-sm font-medium text-white/90 mb-2">الرصيد الحالي</p>
             <p className="text-2xl font-bold">
               {data.overall.balance.toLocaleString()} <span className="text-lg text-white/80">ر.س</span>

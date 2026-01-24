@@ -138,11 +138,11 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
       <div>
-        <h2 className="text-2xl font-bold text-olive-900 dark:text-olive-50 mb-2 flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50 mb-2 flex items-center gap-2">
           <span className="text-2xl">🏠</span>
           إنشاء أسرة جديدة
         </h2>
-        <p className="text-olive-600 dark:text-olive-400 text-sm">
+        <p className="text-gray-600 dark:text-gray-400 text-sm">
           أنشئ أسرة جديدة واربطها بالأشخاص الموجودين
         </p>
       </div>
@@ -157,7 +157,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
       )}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+        <label htmlFor="title" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
           عنوان الأسرة (اختياري)
         </label>
         <input
@@ -165,20 +165,20 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
           type="text"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all"
           placeholder="مثال: أسرة محمد وعائشة"
         />
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <label className="block text-sm font-semibold text-olive-800 dark:text-olive-200">
+          <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200">
             أعضاء الأسرة
           </label>
           <button
             type="button"
             onClick={addMember}
-            className="px-4 py-2 bg-olive-100 dark:bg-olive-900/30 text-olive-700 dark:text-olive-400 font-medium rounded-lg hover:bg-olive-200 dark:hover:bg-olive-900/50 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-900/50 transition-colors flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -188,7 +188,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
         </div>
 
         {loadingPersons ? (
-          <div className="text-center py-8 text-olive-600 dark:text-olive-400">جاري تحميل الأشخاص...</div>
+          <div className="text-center py-8 text-gray-600 dark:text-gray-400">جاري تحميل الأشخاص...</div>
         ) : personsLoadError ? (
           <div className="text-center py-8 px-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
             <p className="text-orange-700 dark:text-orange-400 font-medium mb-4">{personsLoadError}</p>
@@ -205,18 +205,18 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
             {formData.members.map((member, index) => (
               <div
                 key={index}
-                className="bg-olive-50/80 dark:bg-olive-900/30 rounded-xl p-4 border border-olive-200 dark:border-olive-700"
+                className="bg-gray-50/80 dark:bg-gray-900/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-end justify-between gap-4 mb-3">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-olive-800 dark:text-olive-200 mb-2">
+                    <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
                       الشخص
                     </label>
                     <select
                       required
                       value={member.personId}
                       onChange={(e) => updateMember(index, 'personId', e.target.value)}
-                      className="w-full px-4 py-2.5 border border-olive-200 dark:border-olive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-500 bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50"
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50"
                     >
                       <option value="">اختر شخصاً...</option>
                       {persons.map((person) => (
@@ -238,14 +238,14 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-olive-800 dark:text-olive-200 mb-2">
+                    <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
                       الدور
                     </label>
                     <select
                       required
                       value={member.role}
                       onChange={(e) => updateMember(index, 'role', e.target.value as HouseholdMemberRole)}
-                      className="w-full px-4 py-2.5 border border-olive-200 dark:border-olive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-500 bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50"
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50"
                     >
                       <option value="husband">زوج</option>
                       <option value="wife">زوجة</option>
@@ -259,9 +259,9 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
                           type="checkbox"
                           checked={member.isPrimarySpouse}
                           onChange={(e) => updateMember(index, 'isPrimarySpouse', e.target.checked)}
-                          className="w-4 h-4 text-olive-600 rounded focus:ring-olive-500"
+                          className="w-4 h-4 text-gray-600 rounded focus:ring-primary-500"
                         />
-                        <span className="text-sm text-olive-700 dark:text-olive-300">زوجة أساسية</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">زوجة أساسية</span>
                       </label>
                     </div>
                   )}
@@ -269,7 +269,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
               </div>
             ))}
             {formData.members.length === 0 && (
-              <div className="text-center py-8 text-olive-600 dark:text-olive-400 border-2 border-dashed border-olive-200 dark:border-olive-700 rounded-xl">
+              <div className="text-center py-8 text-gray-600 dark:text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
                 {'اضغط على \'إضافة عضو\' لإضافة أعضاء للأسرة'}
               </div>
             )}
@@ -304,7 +304,7 @@ export default function AddHouseholdForm({ onSuccess, onCancel }: AddHouseholdFo
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 bg-olive-100 dark:bg-olive-800/50 text-olive-800 dark:text-olive-200 font-semibold rounded-xl hover:bg-olive-200 dark:hover:bg-olive-800 transition-all"
+            className="px-6 py-3 bg-gray-100 dark:bg-gray-800/50 text-gray-800 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
           >
             إلغاء
           </button>

@@ -13,7 +13,7 @@ export default function DashboardLayout({ children, role = 'member' }: Dashboard
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-olive-50/80 via-gold-50/40 to-olive-100/80 dark:from-olive-950 dark:via-olive-900 dark:to-olive-950">
+    <div className="flex h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Sidebar role={role} isMobileOpen={isMobileMenuOpen} onMobileClose={() => setIsMobileMenuOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />

@@ -94,14 +94,14 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <h2 className="text-2xl font-bold text-olive-900 dark:text-olive-50 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50 flex items-center gap-2">
             <span className="text-2xl">➕</span>
             إضافة شخص جديد
           </h2>
           <button
             type="button"
             onClick={loadAndTogglePersonsList}
-            className="px-4 py-2 text-sm font-medium bg-olive-100 dark:bg-olive-800/50 text-olive-700 dark:text-olive-300 rounded-lg hover:bg-olive-200 dark:hover:bg-olive-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -109,22 +109,22 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             {showPersonsList ? 'إخفاء القائمة' : 'عرض الأشخاص المضافة سابقاً'}
           </button>
         </div>
-        <p className="text-olive-600 dark:text-olive-400 text-sm">
+        <p className="text-gray-600 dark:text-gray-400 text-sm">
           أضف شخصاً جديداً إلى الشجرة العائلية
         </p>
         {showPersonsList && (
-          <div className="mt-4 p-4 bg-olive-50/80 dark:bg-olive-900/30 rounded-xl border border-olive-200 dark:border-olive-700 max-h-64 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-olive-800 dark:text-olive-200 mb-3">الأشخاص المضافة سابقاً</h3>
+          <div className="mt-4 p-4 bg-gray-50/80 dark:bg-gray-900/30 rounded-xl border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">الأشخاص المضافة سابقاً</h3>
             {loadingPersons ? (
-              <p className="text-olive-600 dark:text-olive-400 text-sm">جاري التحميل...</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">جاري التحميل...</p>
             ) : persons.length === 0 ? (
-              <p className="text-olive-600 dark:text-olive-400 text-sm">لا يوجد أشخاص.</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">لا يوجد أشخاص.</p>
             ) : (
               <ul className="space-y-2">
                 {persons.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between text-sm text-olive-700 dark:text-olive-300 py-1 border-b border-olive-200 dark:border-olive-700 last:border-0">
+                  <li key={p.id} className="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 py-1 border-b border-gray-200 dark:border-gray-700 last:border-0">
                     <span className="font-medium">{p.fullName}</span>
-                    <span className="text-olive-500 dark:text-olive-400">{p.gender === 'male' ? 'ذكر' : 'أنثى'}</span>
+                    <span className="text-gray-500 dark:text-gray-400">{p.gender === 'male' ? 'ذكر' : 'أنثى'}</span>
                   </li>
                 ))}
               </ul>
@@ -144,7 +144,7 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
-          <label htmlFor="fullName" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+          <label htmlFor="fullName" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
             الاسم الكامل <span className="text-red-500">*</span>
           </label>
           <input
@@ -153,13 +153,13 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             required
             value={formData.fullName}
             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all"
             placeholder="أدخل الاسم الكامل"
           />
         </div>
 
         <div>
-          <label htmlFor="gender" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+          <label htmlFor="gender" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
             الجنس <span className="text-red-500">*</span>
           </label>
           <select
@@ -167,7 +167,7 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             required
             value={formData.gender}
             onChange={(e) => setFormData({ ...formData, gender: e.target.value as Gender })}
-            className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all"
           >
             <option value="male">ذكر</option>
             <option value="female">أنثى</option>
@@ -175,7 +175,7 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
         </div>
 
         <div>
-          <label htmlFor="birthDate" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+          <label htmlFor="birthDate" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
             تاريخ الميلاد
           </label>
           <input
@@ -183,12 +183,12 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             type="date"
             value={formData.birthDate}
             onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-            className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all"
           />
         </div>
 
         <div>
-          <label htmlFor="deathDate" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+          <label htmlFor="deathDate" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
             تاريخ الوفاة (إن وجد)
           </label>
           <input
@@ -196,12 +196,12 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             type="date"
             value={formData.deathDate}
             onChange={(e) => setFormData({ ...formData, deathDate: e.target.value })}
-            className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label htmlFor="notes" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+          <label htmlFor="notes" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
             ملاحظات
           </label>
           <textarea
@@ -209,7 +209,7 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
             rows={4}
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 transition-all resize-none"
             placeholder="أضف أي ملاحظات إضافية..."
           />
         </div>
@@ -242,7 +242,7 @@ export default function AddPersonForm({ onSuccess, onCancel }: AddPersonFormProp
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 bg-olive-100 dark:bg-olive-800/50 text-olive-800 dark:text-olive-200 font-semibold rounded-xl hover:bg-olive-200 dark:hover:bg-olive-800 transition-all"
+            className="px-6 py-3 bg-gray-100 dark:bg-gray-800/50 text-gray-800 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
           >
             إلغاء
           </button>

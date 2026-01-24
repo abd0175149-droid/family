@@ -3,13 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --background: #fdfcf8;
-  --foreground: #1d1c0e;
+  --background: #f4f4f5;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #1d1c0e;
-  --border: #e8e6d0;
-  --muted: #f5f4e8;
-  --muted-foreground: #535022;
+  --card-foreground: #18181b;
+  --border: #e4e4e7;
+  --muted: #fafafa;
+  --muted-foreground: #71717a;
+  --primary: #AA2B1D;
   --olive: #8A8635;
   --burgundy: #AA2B1D;
   --orange: #CC561E;
@@ -18,13 +19,13 @@
 
 [data-theme='dark'],
 .dark {
-  --background: #0f0f07;
-  --foreground: #f5f4e8;
-  --card: #1d1c0e;
-  --card-foreground: #f5f4e8;
-  --border: #38361a;
-  --muted: #1d1c0e;
-  --muted-foreground: #b9b47a;
+  --background: #18181b;
+  --foreground: #fafafa;
+  --card: #27272a;
+  --card-foreground: #fafafa;
+  --border: #3f3f46;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
 }
 
 * {
@@ -50,7 +51,7 @@ body {
   }
 
   .gradient-primary {
-    @apply bg-gradient-to-r from-olive-500 to-gold-400;
+    @apply bg-gradient-to-r from-primary-500 to-primary-700;
   }
 
   /* تصميم أنيق بدون gradients مبالغ بها */
@@ -67,16 +68,16 @@ body {
   }
   
   .glass-effect {
-    background: rgba(253, 252, 248, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(138, 134, 53, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.06);
   }
   
   .dark .glass-effect,
   .glass-effect.dark {
-    background: rgba(29, 28, 14, 0.9);
-    border: 1px solid rgba(243, 207, 122, 0.15);
+    background: rgba(39, 39, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
 

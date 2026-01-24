@@ -57,15 +57,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-olive-50 via-gold-50/60 to-olive-100 dark:from-olive-950 dark:via-olive-900 dark:to-olive-950 p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 p-4 sm:p-6">
       <div className="w-full max-w-md animate-scale-in">
-        <div className="bg-white/90 dark:bg-olive-950/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-olive-200/50 dark:border-olive-800/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           <div className="gradient-primary p-6 sm:p-8 text-center">
             <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-glow">
               <span className="text-3xl sm:text-4xl">🌳</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">مرحباً بك</h2>
-            <p className="text-gold-100 text-sm opacity-90">منصة عائلية متكاملة</p>
+            <p className="text-white/90 text-sm">منصة عائلية متكاملة</p>
           </div>
 
           {/* Form */}
@@ -81,12 +81,12 @@ export default function LoginPage() {
 
             <div className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
                   البريد الإلكتروني
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-olive-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                     </svg>
                   </div>
@@ -97,19 +97,19 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pr-10 pl-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+                    className="w-full pr-10 pl-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-all"
                     placeholder="example@family.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
                   كلمة المرور
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-olive-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pr-10 pl-4 py-3 border border-olive-200 dark:border-olive-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-olive-500 focus:border-transparent bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 transition-all"
+                    className="w-full pr-10 pl-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-all"
                     placeholder="••••••••"
                   />
                 </div>
@@ -150,13 +150,13 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-          <p className="text-center text-olive-600 dark:text-olive-400 text-xs px-6 sm:px-8 pb-6">
+          <p className="text-center text-gray-500 dark:text-gray-400 text-xs px-6 sm:px-8 pb-6">
             إذا واجهتك مشكلة في التوجيه أو التصميم، جرّب التحديث القسري (Ctrl+Shift+R) أو مسح كاش الموقع.
           </p>
         </div>
 
-        <div className="absolute top-10 left-10 w-72 h-72 bg-olive-300/20 rounded-full blur-3xl -z-10 animate-pulse" aria-hidden />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-gold-400/20 rounded-full blur-3xl -z-10 animate-pulse delay-1000" aria-hidden />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-primary-300/15 rounded-full blur-3xl -z-10 animate-pulse" aria-hidden />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-400/10 rounded-full blur-3xl -z-10 animate-pulse delay-1000" aria-hidden />
       </div>
     </div>
   )

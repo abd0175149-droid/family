@@ -10,10 +10,10 @@ export default function TreePage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-olive-900 dark:text-olive-50 mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">
               الشجرة العائلية
             </h1>
-            <p className="text-olive-600 dark:text-olive-400 text-sm sm:text-base">استكشف روابط العائلة وعلاقاتها</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">استكشف روابط العائلة وعلاقاتها</p>
           </div>
           <Link
             href="/tree/add"

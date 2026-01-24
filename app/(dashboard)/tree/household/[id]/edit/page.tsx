@@ -182,7 +182,7 @@ export default function EditHouseholdPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[300px]">
-          <div className="w-12 h-12 border-4 border-olive-200 border-t-olive-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin" />
         </div>
       </DashboardLayout>
     )
@@ -191,7 +191,7 @@ export default function EditHouseholdPage() {
   if (error && !household) {
     return (
       <DashboardLayout>
-        <div className="glass-effect rounded-2xl p-6 text-center border border-olive-200/50 dark:border-olive-800/50">
+        <div className="glass-effect rounded-2xl p-6 text-center border border-gray-200/50 dark:border-gray-800/50">
           <p className="text-burgundy-600 dark:text-burgundy-400 font-medium mb-4">{error}</p>
           <Link
             href="/tree"
@@ -209,35 +209,35 @@ export default function EditHouseholdPage() {
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-olive-900 dark:text-olive-50 mb-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 mb-1">
               تعديل الأسرة
             </h1>
-            <p className="text-olive-600 dark:text-olive-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               تعديل العنوان، إضافة أعضاء أو إزالتهم
             </p>
           </div>
           <Link
             href="/tree"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-olive-100 dark:bg-olive-800/50 text-olive-800 dark:text-olive-200 rounded-xl font-medium hover:bg-olive-200 dark:hover:bg-olive-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-800/50 text-gray-800 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
           >
             ← العودة للشجرة
           </Link>
         </div>
 
-        <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-olive-200/50 dark:border-olive-800/50 space-y-6">
+        <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-800/50 space-y-6">
           {error && (
             <div className="bg-burgundy-50 dark:bg-burgundy-900/20 border border-burgundy-200 dark:border-burgundy-800 text-burgundy-700 dark:text-burgundy-400 px-4 py-3 rounded-xl flex items-center gap-2">
               <span className="text-sm font-medium">{error}</span>
             </div>
           )}
           {successMsg && (
-            <div className="bg-olive-50 dark:bg-olive-900/30 border border-olive-200 dark:border-olive-700 text-olive-800 dark:text-olive-200 px-4 py-3 rounded-xl flex items-center gap-2">
+            <div className="bg-gray-50 dark:bg-gray-900/30 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-xl flex items-center gap-2">
               <span className="text-sm font-medium">✓ {successMsg}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-semibold text-olive-800 dark:text-olive-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
               عنوان الأسرة (اختياري)
             </label>
             <div className="flex gap-2">
@@ -245,7 +245,7 @@ export default function EditHouseholdPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="flex-1 px-4 py-2.5 border border-olive-200 dark:border-olive-700 rounded-xl bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50 focus:ring-2 focus:ring-olive-500"
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50 focus:ring-2 focus:ring-primary-500"
                 placeholder="مثال: أسرة محمد وعائشة"
               />
               <button
@@ -259,20 +259,20 @@ export default function EditHouseholdPage() {
             </div>
           </div>
 
-          <div className="border-t border-olive-200 dark:border-olive-700 pt-6">
-            <h2 className="text-lg font-bold text-olive-900 dark:text-olive-50 mb-4">الأعضاء الحاليون</h2>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-4">الأعضاء الحاليون</h2>
             {household?.members.length === 0 ? (
-              <p className="text-olive-600 dark:text-olive-400 text-sm py-4">لا يوجد أعضاء بعد.</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm py-4">لا يوجد أعضاء بعد.</p>
             ) : (
               <ul className="space-y-3">
                 {household?.members.map((m) => (
                   <li
                     key={m.id}
-                    className="flex flex-wrap items-center justify-between gap-2 p-3 bg-olive-50/80 dark:bg-olive-900/30 rounded-xl border border-olive-200 dark:border-olive-700"
+                    className="flex flex-wrap items-center justify-between gap-2 p-3 bg-gray-50/80 dark:bg-gray-900/30 rounded-xl border border-gray-200 dark:border-gray-700"
                   >
                     <div>
-                      <span className="font-medium text-olive-900 dark:text-olive-100">{m.person.fullName}</span>
-                      <span className="text-olive-600 dark:text-olive-400 text-sm mr-2">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{m.person.fullName}</span>
+                      <span className="text-gray-600 dark:text-gray-400 text-sm mr-2">
                         — {roleLabel[m.role] ?? m.role}
                         {m.role === 'wife' && m.isPrimarySpouse && ' (زوجة أساسية)'}
                       </span>
@@ -291,29 +291,29 @@ export default function EditHouseholdPage() {
             )}
           </div>
 
-          <div className="border-t border-olive-200 dark:border-olive-700 pt-6">
-            <h2 className="text-lg font-bold text-olive-900 dark:text-olive-50 mb-4">إضافة عضو</h2>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-4">إضافة عضو</h2>
             {!persons.length && !loadingPersons && !personsLoadError && (
               <button
                 type="button"
                 onClick={loadPersons}
-                className="px-4 py-2 bg-olive-100 dark:bg-olive-800/50 text-olive-700 dark:text-olive-300 rounded-lg font-medium hover:bg-olive-200 dark:hover:bg-olive-800"
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-800"
               >
                 تحميل قائمة الأشخاص
               </button>
             )}
-            {loadingPersons && <p className="text-olive-600 dark:text-olive-400 text-sm py-2">جاري التحميل...</p>}
+            {loadingPersons && <p className="text-gray-600 dark:text-gray-400 text-sm py-2">جاري التحميل...</p>}
             {personsLoadError && (
               <p className="text-burgundy-600 dark:text-burgundy-400 text-sm py-2">{personsLoadError}</p>
             )}
             {persons.length > 0 && (
               <div className="flex flex-wrap gap-3 items-end">
                 <div className="flex-1 min-w-[180px]">
-                  <label className="block text-xs font-medium text-olive-600 dark:text-olive-400 mb-1">الشخص</label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">الشخص</label>
                   <select
                     value={addPersonId}
                     onChange={(e) => setAddPersonId(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-olive-200 dark:border-olive-700 rounded-xl bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50"
+                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50"
                   >
                     <option value="">اختر شخصاً...</option>
                     {persons
@@ -326,7 +326,7 @@ export default function EditHouseholdPage() {
                   </select>
                 </div>
                 <div className="w-32">
-                  <label className="block text-xs font-medium text-olive-600 dark:text-olive-400 mb-1">الدور</label>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">الدور</label>
                   <select
                     value={addRole}
                     onChange={(e) => {
@@ -334,7 +334,7 @@ export default function EditHouseholdPage() {
                       setAddRole(v)
                       if (v !== 'wife') setAddIsPrimarySpouse(false)
                     }}
-                    className="w-full px-4 py-2.5 border border-olive-200 dark:border-olive-700 rounded-xl bg-white dark:bg-olive-900/50 text-olive-900 dark:text-olive-50"
+                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900/50 text-gray-900 dark:text-gray-50"
                   >
                     <option value="husband">زوج</option>
                     <option value="wife">زوجة</option>
@@ -347,9 +347,9 @@ export default function EditHouseholdPage() {
                       type="checkbox"
                       checked={addIsPrimarySpouse}
                       onChange={(e) => setAddIsPrimarySpouse(e.target.checked)}
-                      className="w-4 h-4 text-olive-600 rounded focus:ring-olive-500"
+                      className="w-4 h-4 text-gray-600 rounded focus:ring-primary-500"
                     />
-                    <span className="text-sm text-olive-700 dark:text-olive-300">زوجة أساسية</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">زوجة أساسية</span>
                   </label>
                 )}
                 <button

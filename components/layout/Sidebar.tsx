@@ -52,9 +52,9 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 flex-col glass-effect border-r border-olive-200/50 dark:border-olive-800/50 shadow-soft">
-        <div className="p-6 border-b border-olive-200/50 dark:border-olive-800/50">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-olive-600 to-burgundy-500 bg-clip-text text-transparent">
+      <aside className="hidden lg:flex w-72 flex-col glass-effect border-r border-gray-200 dark:border-gray-800 shadow-soft">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
             القائمة الرئيسية
           </h2>
         </div>
@@ -71,7 +71,7 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                   'hover:scale-[1.02] active:scale-[0.98]',
                   isActive
                     ? 'gradient-primary text-white shadow-glow'
-                    : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
                 )}
               >
                 <span className={cn(
@@ -82,7 +82,7 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                 </span>
                 <span className={cn(
                   'font-medium',
-                  isActive ? 'text-white' : 'group-hover:text-olive-600 dark:group-hover:text-olive-400'
+                  isActive ? 'text-white' : 'group-hover:text-primary-600 dark:group-hover:text-primary-400'
                 )}>
                   {item.label}
                 </span>
@@ -98,19 +98,19 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
       {/* Mobile Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 right-0 z-50 w-72 bg-white/95 dark:bg-olive-950/95 backdrop-blur-xl',
-          'border-l border-olive-200/50 dark:border-olive-800/50 shadow-2xl',
+          'fixed inset-y-0 right-0 z-50 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl',
+          'border-l border-gray-200 dark:border-gray-800 shadow-2xl',
           'transform transition-transform duration-300 ease-in-out lg:hidden',
           isMobileOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="p-6 border-b border-olive-200/50 dark:border-olive-800/50 flex items-center justify-between">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-olive-600 to-burgundy-500 bg-clip-text text-transparent">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
             القائمة الرئيسية
           </h2>
           <button
             onClick={onMobileClose}
-            className="p-2 rounded-lg hover:bg-olive-100 dark:hover:bg-olive-800/50 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Close menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                   'hover:scale-[1.02] active:scale-[0.98]',
                   isActive
                     ? 'gradient-primary text-white shadow-glow'
-                    : 'text-olive-700 dark:text-olive-300 hover:bg-olive-100 dark:hover:bg-olive-800/50'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
                 )}
               >
                 <span className={cn(
@@ -142,7 +142,7 @@ export default function Sidebar({ role, isMobileOpen = false, onMobileClose }: S
                 </span>
                 <span className={cn(
                   'font-medium',
-                  isActive ? 'text-white' : 'group-hover:text-olive-600 dark:group-hover:text-olive-400'
+                  isActive ? 'text-white' : 'group-hover:text-primary-600 dark:group-hover:text-primary-400'
                 )}>
                   {item.label}
                 </span>

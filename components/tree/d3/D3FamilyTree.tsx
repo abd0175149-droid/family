@@ -58,10 +58,10 @@ function buildHierarchy(families: Family[]): TreeNode[] {
   return rootFamilies.map(toNode)
 }
 
-const NODE_WIDTH = 140
-const NODE_HEIGHT = 56
-const DX = 180
-const DY = 120
+const NODE_WIDTH = 200
+const NODE_HEIGHT = 100
+const DX = 220
+const DY = 160
 
 export default function D3FamilyTree() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -127,15 +127,18 @@ export default function D3FamilyTree() {
     svg.call(zoom as any)
 
     const linkGen = d3.linkHorizontal().x((d: any) => d.y).y((d: any) => d.x)
-    g.append('g')
+    const linkGrp = g.append('g')
       .attr('fill', 'none')
-      .attr('stroke', '#8A8635')
-      .attr('stroke-opacity', 0.6)
-      .attr('stroke-width', 2)
-      .selectAll('path')
+      .attr('stroke', '#AA2B1D')
+      .attr('stroke-opacity', 0.7)
+      .attr('stroke-width', 2.5)
+    linkGrp.selectAll('path')
       .data(links)
       .join('path')
       .attr('d', linkGen as any)
+      .each(function () {
+        d3.select(this).append('title').text('علاقة أبوية')
+      })
 
     const node = g
       .append('g')
@@ -151,37 +154,50 @@ export default function D3FamilyTree() {
       .attr('height', NODE_HEIGHT)
       .attr('x', -NODE_WIDTH / 2)
       .attr('y', -NODE_HEIGHT / 2)
-      .attr('rx', 8)
-      .attr('fill', (d: any) => (d.data.id === selectedId ? '#F3CF7A' : '#f5f4e8'))
-      .attr('stroke', (d: any) => (d.data.id === selectedId ? '#CC561E' : '#8A8635'))
-      .attr('stroke-width', (d: any) => (d.data.id === selectedId ? 3 : 1.5))
+      .attr('rx', 10)
+      .attr('fill', (d: any) => (d.data.id === selectedId ? '#F3CF7A' : '#fafafa'))
+      .attr('stroke', (d: any) => (d.data.id === selectedId ? '#CC561E' : '#AA2B1D'))
+      .attr('stroke-width', (d: any) => (d.data.id === selectedId ? 3 : 2))
 
-    node
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('dy', -6)
-      .attr('font-size', 11)
-      .attr('fill', '#1d1c0e')
-      .text((d: any) => {
-        const f = d.data.data as Family
-        if (f.title) return f.title
-        const h = f.members.find((m) => m.role === 'husband')?.person?.fullName
-        const w = f.members.find((m) => m.role === 'wife')?.person?.fullName
-        if (h && w) return `${h} & ${w}`
-        return h || w || 'أسرة'
-      })
+    function lines(f: Family): string[] {
+      const out: string[] = []
+      if (f.title) out.push(f.title)
+      const husbands = f.members.filter((m) => m.role === 'husband').map((m) => m.person.fullName)
+      const wives = f.members.filter((m) => m.role === 'wife').map((m) => m.person.fullName)
+      const children = f.members.filter((m) => m.role === 'child').map((m) => m.person.fullName)
+      if (husbands.length) out.push('زوج: ' + husbands.join('، '))
+      if (wives.length) out.push('زوجة: ' + wives.join('، '))
+      if (children.length) {
+        if (children.length <= 3) out.push('أطفال: ' + children.join('، '))
+        else out.push(`أطفال: ${children.length} (${children.slice(0, 2).join('، ')}...)`)
+      }
+      if (!out.length) out.push('أسرة')
+      return out
+    }
 
-    node
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('dy', 8)
-      .attr('font-size', 10)
-      .attr('fill', '#535022')
-      .text((d: any) => {
-        const f = d.data.data as Family
-        const n = f.members.filter((m) => m.role === 'child').length
-        return n ? `${n} أطفال` : ''
+    const lineHeight = 14
+    node.each(function (d: any) {
+      const f = d.data.data as Family
+      const texts = lines(f)
+      const gNode = d3.select(this)
+      texts.forEach((t, i) => {
+        const s = t.length > 28 ? t.slice(0, 26) + '…' : t
+        gNode
+          .append('text')
+          .attr('text-anchor', 'middle')
+          .attr('dy', -NODE_HEIGHT / 2 + 18 + i * lineHeight)
+          .attr('font-size', i === 0 ? 11 : 10)
+          .attr('font-weight', i === 0 ? 'bold' : 'normal')
+          .attr('fill', i === 0 ? '#18181b' : '#52525b')
+          .attr('x', 0)
+          .text(s)
       })
+    })
+
+    node.append('title').text((d: any) => {
+      const f = d.data.data as Family
+      return lines(f).join('\n')
+    })
 
     node.on('click', (_: any, d: any) => {
       setSelectedId(d.data.id)
@@ -211,8 +227,8 @@ export default function D3FamilyTree() {
     return (
       <div className="flex items-center justify-center min-h-[500px]">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-2 border-olive-200 border-t-olive-600 rounded-full animate-spin mx-auto" />
-          <p className="text-olive-600 dark:text-olive-400 font-medium">جاري تحميل الشجرة...</p>
+          <div className="w-12 h-12 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto" />
+          <p className="text-gray-600 dark:text-gray-400 font-medium">جاري تحميل الشجرة...</p>
         </div>
       </div>
     )
@@ -220,8 +236,8 @@ export default function D3FamilyTree() {
 
   if (error) {
     return (
-      <div className="rounded-2xl glass-effect p-8 text-center border border-olive-200/50 dark:border-olive-800/50">
-        <p className="text-burgundy-600 dark:text-burgundy-400 font-medium">{error}</p>
+      <div className="rounded-2xl glass-effect p-8 text-center border border-gray-200/50 dark:border-gray-800/50">
+        <p className="text-primary-600 dark:text-primary-400 font-medium">{error}</p>
       </div>
     )
   }
@@ -229,10 +245,10 @@ export default function D3FamilyTree() {
   const families = treeData?.families ?? treeData?.households ?? []
   if (families.length === 0) {
     return (
-      <div className="rounded-2xl glass-effect p-8 sm:p-12 text-center border border-olive-200/50 dark:border-olive-800/50">
+      <div className="rounded-2xl glass-effect p-8 sm:p-12 text-center border border-gray-200/50 dark:border-gray-800/50">
         <div className="text-5xl mb-4">🌳</div>
-        <p className="text-lg font-semibold text-olive-800 dark:text-olive-200 mb-2">لا توجد بيانات في الشجرة</p>
-        <p className="text-olive-600 dark:text-olive-400">ابدأ بإضافة أسر جديدة</p>
+        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">لا توجد بيانات في الشجرة</p>
+        <p className="text-gray-600 dark:text-gray-400">ابدأ بإضافة أسر جديدة</p>
       </div>
     )
   }
@@ -243,25 +259,45 @@ export default function D3FamilyTree() {
     <div className="space-y-4">
       <div
         ref={containerRef}
-        className="w-full overflow-hidden rounded-xl border border-olive-200/50 dark:border-olive-800/50 bg-gradient-to-br from-olive-50 to-gold-50/50 dark:from-olive-950 dark:to-olive-900 shadow-soft"
+        className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 shadow-soft"
         style={{ minHeight: 'min(500px, 60vh)' }}
       >
         <svg ref={svgRef} className="block w-full" style={{ minHeight: 400 }} />
       </div>
       {selected && (
-        <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-olive-200/50 dark:border-olive-800/50">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-olive-900 dark:text-olive-50">
-                {selected.title || 'أسرة'}
+        <div className="glass-effect rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-800">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-3">
+                {selected.title || 'أسرة'} — العلاقات والأفراد
               </h3>
-              <p className="text-sm text-olive-600 dark:text-olive-400 mt-1">
-                {selected.members.length} أعضاء
-              </p>
+              <div className="space-y-2 text-sm">
+                {selected.members.filter((m) => m.role === 'husband').length > 0 && (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold text-primary-600">الزوج:</span>{' '}
+                    {selected.members.filter((m) => m.role === 'husband').map((m) => m.person.fullName).join('، ')}
+                  </p>
+                )}
+                {selected.members.filter((m) => m.role === 'wife').length > 0 && (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold text-primary-600">الزوجات:</span>{' '}
+                    {selected.members.filter((m) => m.role === 'wife').map((m) => m.person.fullName).join('، ')}
+                  </p>
+                )}
+                {selected.members.filter((m) => m.role === 'child').length > 0 && (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <span className="font-semibold text-primary-600">الأطفال:</span>{' '}
+                    {selected.members.filter((m) => m.role === 'child').map((m) => m.person.fullName).join('، ')}
+                  </p>
+                )}
+                {selected.members.length === 0 && (
+                  <p className="text-gray-500 dark:text-gray-400">لا يوجد أعضاء مسجّلون.</p>
+                )}
+              </div>
             </div>
             <Link
               href={`/tree/household/${selected.id}/edit`}
-              className="inline-flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-xl font-medium hover:shadow-glow transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-xl font-medium hover:shadow-glow transition-all flex-shrink-0"
             >
               ✏️ تعديل الأسرة
             </Link>
